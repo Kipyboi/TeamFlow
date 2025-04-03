@@ -1,4 +1,13 @@
 package Domein;
 
-public class Epic {
+public class Epic extends ScrumItem {
+
+
+
+
+
+    @Override
+    public void zoek() {
+
+    }
 }

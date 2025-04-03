@@ -1,4 +1,8 @@
 package Domein;
 
-public class UserStory {
+public class UserStory extends ScrumItem {
+    @Override
+    public void zoek() {
+
+    }
 }
