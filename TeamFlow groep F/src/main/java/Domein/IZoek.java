@@ -1,5 +1,7 @@
 package Domein;
 
 public interface IZoek {
-    void zoek();
+    void zoek() {
+        // shitt
+    }
 }
