@@ -1,5 +1,7 @@
 package Domein;
 
+import java.util.ArrayList;
+
 public class GebruikerHasScrumItem {
     private int idScrumItem;
 

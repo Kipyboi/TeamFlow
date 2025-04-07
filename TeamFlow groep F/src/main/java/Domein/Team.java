@@ -1,11 +1,13 @@
 package Domein;
 
+import java.util.ArrayList;
+
 public class Team {
     private int IdTeam;
 
     private String TeamNaam;
 
-    private ArrayList<gebruikerhasTeam> gebruikers;
+    private ArrayList<GebruikerHasTeam> gebruikers;
 
     private ArrayList<ScrumItem> scrumItems;
 
@@ -17,5 +19,7 @@ public class Team {
         //hier
     }
 
-    Zoek(): Epic
+    public void Zoek () {
+
+    }
 }
