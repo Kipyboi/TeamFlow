@@ -9,4 +9,24 @@ public class Gebruiker {
     private ArrayList<GebruikerHasScrumItem> scrumItems;
     private ArrayList<Permissie> permissies;
 
+    public Gebruiker (int idGebruiker, String gebruikersNaam) {
+        this.idGebruiker = idGebruiker;
+        this.gebruikersNaam = gebruikersNaam;
+    }
+
+    public String getGebruikersNaam() {
+        return gebruikersNaam;
+    }
+
+    public void setGebruikersNaam(String gebruikersNaam) {
+        this.gebruikersNaam = gebruikersNaam;
+    }
+
+    public int getIdGebruiker() {
+        return idGebruiker;
+    }
+
+    public void setIdGebruiker(int idGebruiker) {
+        this.idGebruiker = idGebruiker;
+    }
 }

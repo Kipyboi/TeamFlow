@@ -1,6 +1,6 @@
 package Domein;
 
 public interface IZoek {
-    void zoek();
+    ScrumItem zoek();
 
 }
