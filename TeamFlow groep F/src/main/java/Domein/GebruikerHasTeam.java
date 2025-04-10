@@ -12,4 +12,12 @@ public class GebruikerHasTeam {
         this.idTeam = idTeam;
     }
 
+    public void gebruikerToevoegen(Gebruiker gebruiker) {
+        
+    }
+
+    public void gebruikerVerwijderen(Gebruiker gebruiker) {
+        //hier
+    }
+
 }

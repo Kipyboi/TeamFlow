@@ -15,13 +15,7 @@ public class Team implements IZoek {
         scrumItems = new ArrayList<>();
     }
 
-    public void gebruikerToevoegen(Gebruiker gebruiker) {
-        gebruikers.add(gebruiker);
-    }
 
-    public void gebruikerVerwijderen(Gebruiker gebruiker) {
-        //hier
-    }
 
     public ScrumItem zoek () {
 
