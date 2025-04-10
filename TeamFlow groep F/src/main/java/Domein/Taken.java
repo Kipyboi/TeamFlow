@@ -5,7 +5,7 @@ public class Taken extends ScrumItem{
     private int IdTaken;
 
     public Taken (int UserStory_IdUserStory, int IdTaken, String scrumItemNaam) {
-        super(scrumItemNaam)
+        super(scrumItemNaam);
         this.UserStory_IdUserStory = UserStory_IdUserStory;
         this.IdTaken = IdTaken;
     }
