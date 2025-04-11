@@ -5,7 +5,7 @@ import java.util.ArrayList;
 public class Gebruiker {
     private int idGebruiker;
     private String gebruikersNaam;
-    private ArrayList<GebruikerHasTeam> Teams;
+    private ArrayList<GebruikerHasTeam> teams;
     private ArrayList<GebruikerHasScrumItem> scrumItems;
     private ArrayList<Permissie> permissies;
 
@@ -28,5 +28,12 @@ public class Gebruiker {
 
     public void setIdGebruiker(int idGebruiker) {
         this.idGebruiker = idGebruiker;
+    }
+
+    public void addTeam(GebruikerHasTeam ght) {
+        teams.add(ght);
+    }
+    public void removeTeam (GebruikerHasTeam ght) {
+        teams.remove(ght);
     }
 }
