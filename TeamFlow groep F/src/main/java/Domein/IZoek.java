@@ -1,6 +1,6 @@
 package Domein;
 
 public interface IZoek {
-    ScrumItem zoek();
+    ScrumItem zoek(String zoekterm);
 
 }
