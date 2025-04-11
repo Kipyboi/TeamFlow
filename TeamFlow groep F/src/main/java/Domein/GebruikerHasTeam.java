@@ -3,13 +3,13 @@ package Domein;
 import java.util.ArrayList;
 
 public class GebruikerHasTeam {
-    private int idGebruiker;
-    private int idTeam;
+    private Gebruiker gebruiker;
+    private Team team;
     private ArrayList<Bericht> berichten;
 
-    public GebruikerHasTeam(int idGebruiker, int idTeam) {
-        this.idGebruiker = idGebruiker;
-        this.idTeam = idTeam;
+    public GebruikerHasTeam(Gebruiker gebruiker, Team team) {
+        this.gebruiker = gebruiker;
+        this.team = team;
     }
 
     public void gebruikerToevoegen(Gebruiker gebruiker) {

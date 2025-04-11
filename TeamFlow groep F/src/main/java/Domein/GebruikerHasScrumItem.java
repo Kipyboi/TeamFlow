@@ -3,13 +3,13 @@ package Domein;
 import java.util.ArrayList;
 
 public class GebruikerHasScrumItem {
-    private int idScrumItem;
-    private int idGebruiker;
+    private ScrumItem scrumItem;
+    private Gebruiker gebruiker;
     private ArrayList<Bericht> berichten;
 
-    public GebruikerHasScrumItem(int idScrumItem, int idGebruiker) {
-        this.idScrumItem = idScrumItem;
-        this.idGebruiker = idGebruiker;
+    public GebruikerHasScrumItem(Gebruiker gebruiker, ScrumItem scrumItem) {
+        this.scrumItem = scrumItem;
+        this.gebruiker = gebruiker;
 
     }
 }
