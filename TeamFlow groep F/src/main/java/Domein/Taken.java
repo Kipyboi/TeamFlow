@@ -1,13 +1,13 @@
 package Domein;
 
 public class Taken extends ScrumItem{
-    private int UserStory_IdUserStory;
-    private int IdTaken;
+    private int UserStory_idUserStory;
+    private int idTaken;
 
-    public Taken (int UserStory_IdUserStory, int IdTaken, String scrumItemNaam) {
+    public Taken (int UserStory_idUserStory, int IdTaken, String scrumItemNaam) {
         super(scrumItemNaam);
-        this.UserStory_IdUserStory = UserStory_IdUserStory;
-        this.IdTaken = IdTaken;
+        this.UserStory_idUserStory = UserStory_idUserStory;
+        this.idTaken = IdTaken;
     }
     public Taken (String scrumItemNaam ){
         super(scrumItemNaam);
