@@ -1,5 +1,9 @@
 package Domein;
 
+import Utils.DatabaseUtil;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public abstract class ScrumItem{
@@ -28,6 +32,8 @@ public abstract class ScrumItem{
     public int getIdScrumItem () {
         return idScrumItem;
     }
+    public abstract void gebruikerToewijzen (Gebruiker gebruiker) throws SQLException;
+
 
 
 
