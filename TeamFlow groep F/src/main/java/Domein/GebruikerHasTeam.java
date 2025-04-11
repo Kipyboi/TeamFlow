@@ -10,14 +10,20 @@ public class GebruikerHasTeam {
     public GebruikerHasTeam(Gebruiker gebruiker, Team team) {
         this.gebruiker = gebruiker;
         this.team = team;
+        berichten = new ArrayList<>();
     }
 
-    public void gebruikerToevoegen(Gebruiker gebruiker) {
-        
+    public Gebruiker getGebruiker() {
+        return gebruiker;
     }
 
-    public void gebruikerVerwijderen(Gebruiker gebruiker) {
-        //hier
+    public void setGebruiker(Gebruiker gebruiker) {
+        this.gebruiker = gebruiker;
     }
-
+    public Team getTeam() {
+        return team;
+    }
+    public void setTeam(Team team) {
+        this.team = team;
+    }
 }
