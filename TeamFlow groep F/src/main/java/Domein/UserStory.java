@@ -2,7 +2,7 @@ package Domein;
 
 import java.util.ArrayList;
 
-public class UserStory extends ScrumItem {
+public class UserStory extends ScrumItem  implements IZoek {
     private int idUserStory;
     private int Epic_idEpic;
     private ArrayList<Taken> taken;
@@ -17,7 +17,13 @@ public class UserStory extends ScrumItem {
     }
 
     @Override
-    public ScrumItem zoek() {
+    public ScrumItem zoek(String zoekterm) {
+        for (Taken t : taken) {
+            if (t.getScrumItemNaam().toLowerCase().contains(zoekterm.toLowerCase())) {
+                return t;
+            }
+        }
+        return null;
 
     }
 }

@@ -13,8 +13,5 @@ public class Taken extends ScrumItem{
         super(scrumItemNaam);
     }
 
-    @Override
-    public ScrumItem zoek() {
 
-    }
 }

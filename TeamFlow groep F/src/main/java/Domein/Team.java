@@ -53,8 +53,13 @@ public class Team implements IZoek {
 
 
 
-    public ScrumItem zoek () {
-
+    public ScrumItem zoek (String zoekterm) {
+        for (ScrumItem scrumItem : scrumItems) {
+            if (scrumItem.getScrumItemNaam().toLowerCase().contains(zoekterm.toLowerCase())) {
+                return scrumItem;
+            }
+        }
+        return null;
     }
 
     public ArrayList<GebruikerHasTeam> getGebruikers() {

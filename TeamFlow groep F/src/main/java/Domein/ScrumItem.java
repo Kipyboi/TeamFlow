@@ -2,7 +2,7 @@ package Domein;
 
 import java.util.ArrayList;
 
-public abstract class ScrumItem implements IZoek {
+public abstract class ScrumItem{
     protected String scrumItemNaam;
     protected int idScrumItem;
     protected int status;
@@ -18,6 +18,15 @@ public abstract class ScrumItem implements IZoek {
         this.scrumItemNaam = scrumItemNaam;
         gebruikers = new ArrayList<>();
         this.status = 0;
+    }
+    public String getScrumItemNaam () {
+        return scrumItemNaam;
+    }
+    public int getStatus () {
+        return status;
+    }
+    public int getIdScrumItem () {
+        return idScrumItem;
     }
 
 
