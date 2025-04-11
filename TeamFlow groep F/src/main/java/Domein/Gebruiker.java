@@ -36,4 +36,10 @@ public class Gebruiker {
     public void removeTeam (GebruikerHasTeam ght) {
         teams.remove(ght);
     }
+    public void addScrumItem (GebruikerHasScrumItem ghsi) {
+        scrumItems.add(ghsi);
+    }
+    public void removeScrumItem(GebruikerHasScrumItem ghsi) {
+        scrumItems.remove(ghsi);
+    }
 }

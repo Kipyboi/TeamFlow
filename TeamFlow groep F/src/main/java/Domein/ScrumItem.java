@@ -1,8 +1,12 @@
 package Domein;
 
+import Utils.DatabaseUtil;
+
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
-public abstract class ScrumItem implements IZoek {
+public abstract class ScrumItem{
     protected String scrumItemNaam;
     protected int idScrumItem;
     protected int status;
@@ -19,6 +23,17 @@ public abstract class ScrumItem implements IZoek {
         gebruikers = new ArrayList<>();
         this.status = 0;
     }
+    public String getScrumItemNaam () {
+        return scrumItemNaam;
+    }
+    public int getStatus () {
+        return status;
+    }
+    public int getIdScrumItem () {
+        return idScrumItem;
+    }
+    public abstract void gebruikerToewijzen (Gebruiker gebruiker) throws SQLException;
+
 
 
 
