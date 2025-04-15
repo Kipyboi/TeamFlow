@@ -9,7 +9,7 @@ public class DatabaseUtil {
     private static final String USER = "TeamFlow_subjecttax";
     private static final String PASS = "3580404a02bb7f876ea7ca2f84fa6aa87fa95cea";
 
-    public static Connection getConnection () throws SQLException, ClassNotFoundException {
+    public static Connection getConnection () throws SQLException {
         return DriverManager.getConnection(URL, USER, PASS);
     }
 
