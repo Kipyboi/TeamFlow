@@ -30,6 +30,6 @@ public class Bericht {
 
     @Override
     public String toString() {
-        return "idGebruiker: [" + idGebruiker + "] " + (gekoppeldItem == null ? "Geen koppeling" : gekoppeldItem.getNaam()) + " \nidBericht: [" + idBericht + "]" + " bericht: " + bericht + " \ntijdStamp: " + tijdStamp + ""
+        return "idGebruiker: [" + idGebruiker + "] " + (gekoppeldItem == null ? "Geen koppeling" : gekoppeldItem.getScrumItemNaam()) + " \nidBericht: [" + idBericht + "]" + " bericht: " + bericht + " \ntijdStamp: " + tijdStamp + "";
     }
 }
