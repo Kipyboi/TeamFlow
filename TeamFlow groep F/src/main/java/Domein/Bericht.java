@@ -1,6 +1,7 @@
 package Domein;
 
 
+import java.sql.Date;
 import java.sql.Timestamp;
 
 public class Bericht {
@@ -21,6 +22,9 @@ public class Bericht {
         this(idBericht, tijdStamp, bericht, idGebruiker, null);
     }
 
+    public Bericht(int idBericht, Date sqlDate, String berichtTekst, int idGebruiker, Object gekoppeldItem) {
+    }
+
     public ScrumItem getGekoppeldItem() {
         return gekoppeldItem;
     }
@@ -30,6 +34,6 @@ public class Bericht {
 
     @Override
     public String toString() {
-        return "idGebruiker: [" + idGebruiker + "] " + (gekoppeldItem == null ? "Geen koppeling" : gekoppeldItem.getScrumItemNaam()) + " \nidBericht: [" + idBericht + "]" + " bericht: " + bericht + " \ntijdStamp: " + tijdStamp + "";
+        return "idGebruiker: [" + idGebruiker + "] " + (gekoppeldItem == null ? "Algemene bericht" : gekoppeldItem.getScrumItemNaam()) + " \nidBericht: [" + idBericht + "]" + " bericht: " + bericht + " \ntijdStamp: " + tijdStamp + "";
     }
 }
