@@ -1,5 +1,7 @@
 package Domein;
 
+import java.sql.SQLException;
+
 public interface IMenu {
     default void menu() {
         System.out.println("you're not allowed to do this");
@@ -10,7 +12,7 @@ public interface IMenu {
     default void GebruikerInloggen() {
         System.out.println("you're not allowed to do this");
     }
-    default void BerichtAanmaken() {
+    default void BerichtAanmaken() throws SQLException {
         System.out.println("you're not allowed to do this");
     }
     default void GaNaar() {

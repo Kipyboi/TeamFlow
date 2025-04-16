@@ -1,6 +1,8 @@
 package Domein;
 
+import java.util.Scanner;
+
 public interface IZoek {
-    ScrumItem zoek(String zoekterm);
+    void zoek(Scanner scanner);
 
 }

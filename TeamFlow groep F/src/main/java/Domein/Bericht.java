@@ -1,23 +1,23 @@
 package Domein;
 
 
-import java.sql.Timestamp;
+import java.sql.Date;
 
 public class Bericht {
     private int idBericht;
-    private Timestamp tijdStamp;
+    private Date tijdStamp;
     private String bericht;
     private int idGebruiker;
     private ScrumItem gekoppeldItem;
 
-    public Bericht(int idBericht, Timestamp tijdStamp, String bericht, int idGebruiker, ScrumItem gekoppeldItem) {
+    public Bericht(int idBericht, Date tijdStamp, String bericht, int idGebruiker, ScrumItem gekoppeldItem) {
         this.idBericht = idBericht;
         this.tijdStamp = tijdStamp;
         this.bericht = bericht;
         this.idGebruiker = idGebruiker;
         this.gekoppeldItem = gekoppeldItem;
     }
-    public Bericht(int idBericht, Timestamp tijdStamp, String bericht, int idGebruiker) {
+    public Bericht(int idBericht, Date tijdStamp, String bericht, int idGebruiker) {
         this(idBericht, tijdStamp, bericht, idGebruiker, null);
     }
 

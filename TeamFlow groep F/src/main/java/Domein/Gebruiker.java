@@ -42,4 +42,7 @@ public class Gebruiker {
     public void removeScrumItem(GebruikerHasScrumItem ghsi) {
         scrumItems.remove(ghsi);
     }
+    public ArrayList<GebruikerHasScrumItem> getScrumItems() {
+        return scrumItems;
+    }
 }

@@ -12,4 +12,20 @@ public class GebruikerHasScrumItem {
         this.gebruiker = gebruiker;
 
     }
+
+    public ScrumItem getScrumItem() {
+        return scrumItem;
+    }
+
+    public void setScrumItem(ScrumItem scrumItem) {
+        this.scrumItem = scrumItem;
+    }
+
+    public Gebruiker getGebruiker() {
+        return gebruiker;
+    }
+
+    public void setGebruiker(Gebruiker gebruiker) {
+        this.gebruiker = gebruiker;
+    }
 }
