@@ -102,6 +102,33 @@ public class Team implements IZoek, IMenu {
         System.out.println("Bericht aangemaakt!");
         GeselecteerdTeamSession.getGeselecteerdTeam().gaNaar(scanner);
     }
+
+    @Override
+    public void EpicAanmaken (Scanner scanner) throws SQLException {
+        System.out.println("Typ hieronder de naam van de epic die je wilt aanmaken (enter om te versturen): ");
+        String epicNaam = scanner.nextLine();
+        System.out.println("Typ hieronder de beschrijving van " + epicNaam +" (enter om te versturen): ");
+        String epicbeschrijving = scanner.nextLine();
+
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "INSERT INTO Epic (EpicNaam, team_idteam, EpicBeschrijving) VALUES (?, ?, ?)";
+            PreparedStatement statement = connection.prepareStatement(query);
+
+            statement.setString(1, epicNaam);
+            statement.setInt(2, this.idTeam);
+            statement.setString(3, epicbeschrijving);
+
+            statement.executeUpdate();
+        }
+
+        // later op terug komen
+        // waarom heeft epic geen beschijving en naam het heeft aleen een naam, maar in database heeft het beide???
+        Epic epic = new Epic(epicbeschrijving);
+        this.epics.add(epic);
+
+        System.out.println("Epic: "+ epicNaam +" toegevoegd!");
+    }
+
     public void gaNaar (Scanner scanner) {
 
     }

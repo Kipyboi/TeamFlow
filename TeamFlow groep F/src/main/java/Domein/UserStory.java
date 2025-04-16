@@ -57,6 +57,31 @@ public class UserStory extends ScrumItem  implements IZoek {
         }
         System.out.println("De User Story is succesvol aan u toegewezen.");
     }
+
+    @Override
+    public void TaakAanmaken (Scanner scanner) throws SQLException {
+        System.out.println("Typ hieronder de naam van de taak die je wilt aanmaken (enter om te versturen): ");
+        String taakNaam = scanner.nextLine();
+        System.out.println("Typ hieronder de beschrijving van " + taakNaam +" (enter om te versturen): ");
+        String taakBeschrijving = scanner.nextLine();
+
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "INSERT INTO taken (UserStoryNaam, team_idteam, UserStoryBeschrijving) VALUES (?, ?, ?)";
+            PreparedStatement statement = connection.prepareStatement(query);
+
+            statement.setString(1, taakNaam);
+            statement.setInt(2, this.idEpic);
+            statement.setString(3, taakBeschrijving);
+
+            statement.executeUpdate();
+        }
+
+        Taken taak = new Taken (taakBeschrijving);
+        this.taken.add(taak);
+
+        System.out.println("Taak: " + taakNaam + " toegevoegd aan userstory:" + super(scrumItemNaam) + "!");
+    }
+
     public ArrayList<Taken> getTaken() {
         return taken;
     }
