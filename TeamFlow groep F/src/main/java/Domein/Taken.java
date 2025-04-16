@@ -30,6 +30,7 @@ public class Taken extends ScrumItem{
             statement.setInt(2, this.idTaken);
             statement.executeUpdate();
         }
+        System.out.println("De taak is succesvol aan u toegewezen.");
     }
 
 

@@ -5,6 +5,7 @@ import Utils.DatabaseUtil;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public abstract class ScrumItem{
     protected String scrumItemNaam;
@@ -33,6 +34,12 @@ public abstract class ScrumItem{
         return idScrumItem;
     }
     public abstract void gebruikerToewijzen (Gebruiker gebruiker) throws SQLException;
+    public void gaNaar (Scanner scanner) {
+
+    }
+    public ArrayList<GebruikerHasScrumItem> getGebruikers () {
+        return gebruikers;
+    }
 
 
 

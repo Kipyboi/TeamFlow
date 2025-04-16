@@ -1,11 +1,14 @@
 package Domein;
 
 import Utils.DatabaseUtil;
+import Utils.GeselecteerdeEpicSession;
+import Utils.GeselecteerdeUserStorySession;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class UserStory extends ScrumItem  implements IZoek {
     private int idUserStory;
@@ -22,13 +25,23 @@ public class UserStory extends ScrumItem  implements IZoek {
     }
 
     @Override
-    public ScrumItem zoek(String zoekterm) {
-        for (Taken t : taken) {
+    public void zoek(Scanner scanner) {
+        System.out.println("Typ hieronder de naam in van de taak die u zoekt");
+        String zoekterm = scanner.nextLine();
+        UserStory geselecteerdeUserStory = GeselecteerdeUserStorySession.getGeselecteerdeUserStory();
+        for (Taken t : geselecteerdeUserStory.getTaken()) {
             if (t.getScrumItemNaam().toLowerCase().contains(zoekterm.toLowerCase())) {
-                return t;
+                System.out.println(t.getScrumItemNaam());
+                System.out.println();
             }
         }
-        return null;
+        System.out.println("Typ de naam van de epic die u wilt bekijken.");
+        String usNaam = scanner.nextLine();
+        for (Taken t : geselecteerdeUserStory.getTaken()) {
+            if (t.getScrumItemNaam().equalsIgnoreCase(usNaam)) {
+                t.gaNaar(scanner);
+            }
+        }
 
     }
     public void gebruikerToewijzen (Gebruiker gebruiker) throws SQLException {
@@ -42,5 +55,9 @@ public class UserStory extends ScrumItem  implements IZoek {
             statement.setInt(2, this.idUserStory);
             statement.executeUpdate();
         }
+        System.out.println("De User Story is succesvol aan u toegewezen.");
+    }
+    public ArrayList<Taken> getTaken() {
+        return taken;
     }
 }
