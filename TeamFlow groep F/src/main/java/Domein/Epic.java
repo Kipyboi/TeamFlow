@@ -18,12 +18,12 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
     private int idEpic;
     ArrayList<UserStory> UserStories;
 
-    public Epic (int idEpic, String scrumItemNaam) {
-        super(scrumItemNaam);
+    public Epic (int idEpic, String scrumItemNaam, String beschrijving) {
+        super(scrumItemNaam, beschrijving);
         this.idEpic = idEpic;
     }
-    public Epic (String scrumItemNaam) {
-        super(scrumItemNaam);
+    public Epic (String scrumItemNaam, String beschrijving) {
+        super(scrumItemNaam, beschrijving);
     }
 
     @Override
@@ -99,7 +99,7 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
     }
 
     @Override
-    public void UserStoryAanmaken (Scanner scanner) throws SQLException {
+    public void UserstoryAanmaken (Scanner scanner) throws SQLException {
         System.out.println("Typ hieronder de naam van de userstory die je wilt aanmaken (enter om te versturen): ");
         String userstoryNaam = scanner.nextLine();
         System.out.println("Typ hieronder de beschrijving van " + userstoryNaam +" (enter om te versturen): ");
@@ -116,10 +116,10 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
             statement.executeUpdate();
         }
 
-        UserStory userstory = new UserStory (userstorybeschrijving);
+        UserStory userstory = new UserStory (userstoryNaam, userstorybeschrijving);
         this.UserStories.add(userstory);
 
-        System.out.println("Userstory: " + userstoryNaam + " toegevoegd aan epic:" + super(scrumItemNaam) + "!");
+        System.out.println("Userstory: " + userstoryNaam + " toegevoegd aan epic:" + scrumItemNaam + "!");
     }
 
     public ArrayList<UserStory> getUserStories() {

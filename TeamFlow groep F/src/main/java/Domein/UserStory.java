@@ -10,18 +10,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class UserStory extends ScrumItem  implements IZoek {
+public class UserStory extends ScrumItem  implements IZoek, IMenu {
     private int idUserStory;
     private int Epic_idEpic;
     private ArrayList<Taken> taken;
 
-    public UserStory(int idUserStory, int Epic_IdEpic, String scrumItemNaam) {
-        super(scrumItemNaam);
+    public UserStory(int idUserStory, int Epic_IdEpic, String scrumItemNaam, String beschrijving) {
+        super(scrumItemNaam, beschrijving);
         this.idUserStory = idUserStory;
         this.Epic_idEpic = Epic_IdEpic;
     }
-    public UserStory(String scrumItemNaam) {
-        super(scrumItemNaam);
+    public UserStory(String scrumItemNaam, String beschrijving) {
+        super(scrumItemNaam, beschrijving);
     }
 
     @Override
@@ -76,10 +76,10 @@ public class UserStory extends ScrumItem  implements IZoek {
             statement.executeUpdate();
         }
 
-        Taken taak = new Taken (taakBeschrijving);
+        Taken taak = new Taken(taakNaam, taakBeschrijving);
         this.taken.add(taak);
 
-        System.out.println("Taak: " + taakNaam + " toegevoegd aan userstory:" + super(scrumItemNaam) + "!");
+        System.out.println("Taak: " + taakNaam + " toegevoegd aan userstory:" + scrumItemNaam + "!");
     }
 
     public ArrayList<Taken> getTaken() {

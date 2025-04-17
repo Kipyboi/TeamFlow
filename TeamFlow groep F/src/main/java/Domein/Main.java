@@ -39,7 +39,6 @@ public class Main {
                 case 2:
                     GebruikerService aanmaakService = new GebruikerService();
                     aanmaakService.gebruikerAanmaken(scanner);
-
                     break;
                 case 3:
                     System.out.println("Programma afgesloten.");

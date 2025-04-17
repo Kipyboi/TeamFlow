@@ -1,6 +1,7 @@
 package Domein;
 
 import java.sql.SQLException;
+import java.util.Scanner;
 
 public interface IMenu {
     default void menu() {
@@ -21,16 +22,16 @@ public interface IMenu {
     default void GaTerug() {
         System.out.println("you're not allowed to do this");
     }
-    default void TeamAanmaken() {
+    default void TeamAanmaken(Scanner scanner)throws SQLException {
         System.out.println("you're not allowed to do this");
     }
-    default void EpicAanmaken() {
+    default void EpicAanmaken(Scanner scanner)throws SQLException {
         System.out.println("you're not allowed to do this");
     }
-    default void UserstoryAanmaken() {
+    default void UserstoryAanmaken(Scanner scanner) throws SQLException {
         System.out.println("you're not allowed to do this");
     }
-    default void TaakAanmaken() {
+    default void TaakAanmaken(Scanner scanner) throws SQLException {
         System.out.println("you're not allowed to do this");
     }
 }
