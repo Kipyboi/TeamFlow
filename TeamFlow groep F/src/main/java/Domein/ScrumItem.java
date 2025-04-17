@@ -9,6 +9,7 @@ import java.util.Scanner;
 
 public abstract class ScrumItem{
     protected String scrumItemNaam;
+    protected String ScrumItemBeschrijving;
     protected int idScrumItem;
     protected int status;
     protected ArrayList<GebruikerHasScrumItem> gebruikers;
@@ -19,6 +20,14 @@ public abstract class ScrumItem{
         this.status = 0;
         gebruikers = new ArrayList<>();
     }
+
+    public ScrumItem(String scrumItemNaam, ScrumItemBeschrijving) {
+        this.scrumItemNaam = scrumItemNaam;
+        this.ScrumItemBeschrijving = ScrumItemBeschrijving;
+        this.status = 0;
+        gebruikers = new ArrayList<>();
+    }
+
     public ScrumItem (String scrumItemNaam) {
         this.scrumItemNaam = scrumItemNaam;
         gebruikers = new ArrayList<>();
@@ -27,6 +36,11 @@ public abstract class ScrumItem{
     public String getScrumItemNaam () {
         return scrumItemNaam;
     }
+
+    public String getScrumItemBeschrijving () {
+        return scrumItemNaam;
+    }
+
     public int getStatus () {
         return status;
     }

@@ -76,7 +76,7 @@ public class UserStory extends ScrumItem  implements IZoek {
             statement.executeUpdate();
         }
 
-        Taken taak = new Taken (taakBeschrijving);
+        Taken taak = new Taken (taakNaam, taakBeschrijving);
         this.taken.add(taak);
 
         System.out.println("Taak: " + taakNaam + " toegevoegd aan userstory:" + super(scrumItemNaam) + "!");

@@ -116,7 +116,7 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
             statement.executeUpdate();
         }
 
-        UserStory userstory = new UserStory (userstorybeschrijving);
+        UserStory userstory = new UserStory (userstoryNaam, userstorybeschrijving);
         this.UserStories.add(userstory);
 
         System.out.println("Userstory: " + userstoryNaam + " toegevoegd aan epic:" + super(scrumItemNaam) + "!");

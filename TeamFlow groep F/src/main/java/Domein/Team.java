@@ -123,7 +123,7 @@ public class Team implements IZoek, IMenu {
 
         // later op terug komen
         // waarom heeft epic geen beschijving en naam het heeft aleen een naam, maar in database heeft het beide???
-        Epic epic = new Epic(epicbeschrijving);
+        Epic epic = new Epic(epicNaam, epicbeschrijving);
         this.epics.add(epic);
 
         System.out.println("Epic: "+ epicNaam +" toegevoegd!");
