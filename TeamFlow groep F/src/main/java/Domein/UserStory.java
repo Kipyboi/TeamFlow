@@ -66,11 +66,11 @@ public class UserStory extends ScrumItem  implements IZoek {
         String taakBeschrijving = scanner.nextLine();
 
         try (Connection connection = DatabaseUtil.getConnection()) {
-            String query = "INSERT INTO taken (UserStoryNaam, team_idteam, UserStoryBeschrijving) VALUES (?, ?, ?)";
+            String query = "INSERT INTO taken (TaakNaam, Userstory_idUserstory, TaakBeschrijving) VALUES (?, ?, ?)";
             PreparedStatement statement = connection.prepareStatement(query);
 
             statement.setString(1, taakNaam);
-            statement.setInt(2, this.idEpic);
+            statement.setInt(2, this.idUserStory);
             statement.setString(3, taakBeschrijving);
 
             statement.executeUpdate();

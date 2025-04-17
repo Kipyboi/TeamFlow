@@ -106,7 +106,7 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
         String userstorybeschrijving = scanner.nextLine();
 
         try (Connection connection = DatabaseUtil.getConnection()) {
-            String query = "INSERT INTO Userstory (UserStoryNaam, team_idteam, UserStoryBeschrijving) VALUES (?, ?, ?)";
+            String query = "INSERT INTO Userstory (UserStoryNaam, Epic_idEpic, UserStoryBeschrijving) VALUES (?, ?, ?)";
             PreparedStatement statement = connection.prepareStatement(query);
 
             statement.setString(1, userstoryNaam);
