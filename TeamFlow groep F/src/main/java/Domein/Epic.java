@@ -59,6 +59,7 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
         }
         System.out.println("De Epic is succesvol aan u toegewezen.");
     }
+
     public void BerichtAanmaken (Scanner scanner) throws SQLException {
         boolean toegewezen = false;
         for (GebruikerHasScrumItem ghsi : Session.getActiveGebruiker().getScrumItems()) {
@@ -96,6 +97,31 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
             GeselecteerdeEpicSession.getGeselecteerdeEpic().gaNaar(scanner);
         }
     }
+
+    @Override
+    public void UserStoryAanmaken (Scanner scanner) throws SQLException {
+        System.out.println("Typ hieronder de naam van de userstory die je wilt aanmaken (enter om te versturen): ");
+        String userstoryNaam = scanner.nextLine();
+        System.out.println("Typ hieronder de beschrijving van " + userstoryNaam +" (enter om te versturen): ");
+        String userstorybeschrijving = scanner.nextLine();
+
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "INSERT INTO Userstory (UserStoryNaam, Epic_idEpic, UserStoryBeschrijving) VALUES (?, ?, ?)";
+            PreparedStatement statement = connection.prepareStatement(query);
+
+            statement.setString(1, userstoryNaam);
+            statement.setInt(2, this.idEpic);
+            statement.setString(3, userstorybeschrijving);
+
+            statement.executeUpdate();
+        }
+
+        UserStory userstory = new UserStory (userstorybeschrijving);
+        this.UserStories.add(userstory);
+
+        System.out.println("Userstory: " + userstoryNaam + " toegevoegd aan epic:" + super(scrumItemNaam) + "!");
+    }
+
     public ArrayList<UserStory> getUserStories() {
         return UserStories;
     }
