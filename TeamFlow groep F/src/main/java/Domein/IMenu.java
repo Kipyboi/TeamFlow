@@ -13,7 +13,7 @@ public interface IMenu {
     default void GebruikerInloggen() {
         System.out.println("you're not allowed to do this");
     }
-    default void BerichtAanmaken() throws SQLException {
+    default void BerichtAanmaken(Scanner scanner) throws SQLException {
         System.out.println("you're not allowed to do this");
     }
     default void GaNaar() {

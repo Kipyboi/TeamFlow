@@ -59,7 +59,7 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
         }
         System.out.println("De Epic is succesvol aan u toegewezen.");
     }
-
+    @Override
     public void BerichtAanmaken (Scanner scanner) throws SQLException {
         boolean toegewezen = false;
         for (GebruikerHasScrumItem ghsi : Session.getActiveGebruiker().getScrumItems()) {
