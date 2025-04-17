@@ -2,6 +2,8 @@ package Domein;
 
 
 import java.sql.Date;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class Bericht {
     private int idBericht;
@@ -30,6 +32,21 @@ public class Bericht {
 
     @Override
     public String toString() {
-        return "idGebruiker: [" + idGebruiker + "] " + (gekoppeldItem == null ? "Geen koppeling" : gekoppeldItem.getScrumItemNaam()) + " \nidBericht: [" + idBericht + "]" + " bericht: " + bericht + " \ntijdStamp: " + tijdStamp + "";
+        String gebruikersnaam = "Onbekend";
+        try {
+            GebruikerService gebruikerService = new GebruikerService();
+            ArrayList<Gebruiker> gebruikers = gebruikerService.getGebruikers();
+
+            for (Gebruiker gebruiker : gebruikers) {
+                if (this.idGebruiker == gebruiker.getIdGebruiker()) {
+                    gebruikersnaam = gebruiker.getGebruikersNaam();
+                    break;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return tijdStamp.toString() + "\n" + gebruikersnaam + "\n" + bericht;
     }
+
 }

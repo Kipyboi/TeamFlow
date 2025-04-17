@@ -55,4 +55,7 @@ public class GebruikerService {
         }
         return false;
     }
+    public ArrayList<Gebruiker> getGebruikers () {
+        return gebruikers;
+    }
 }
