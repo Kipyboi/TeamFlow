@@ -8,6 +8,7 @@ import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -120,6 +121,24 @@ public class Team implements IZoek, IMenu {
 
             statement.executeUpdate();
         }
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "SELECT idEpic FROM Epic WHERE EpicNaam = ? AND team_idteam = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, epicNaam);
+            statement.setInt(2, this.idTeam);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                this.idEpic = resultSet.getInt("idEpic");
+            }
+        }
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "INSERT INTO Epic_has_gebruiker (gebruiker_idGebruiker, Epic_idEpic) VALUES (?, ?)";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, Session.getActiveGebruiker().getIdGebruiker());
+            statement.setInt(2, this.idEpic);
+            statement.executeUpdate();
+        }
+
 
         // later op terug komen
         // waarom heeft epic geen beschijving en naam het heeft aleen een naam, maar in database heeft het beide???
@@ -143,5 +162,87 @@ public class Team implements IZoek, IMenu {
 
     public ArrayList<Epic> getEpics() {
         return epics;
+    }
+
+    public void toonBerichten() {
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "SELECT * FROM Bericht_Team WHERE gebruiker_has_team_team_idTeam = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, this.idTeam);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                int idBericht = resultSet.getInt("idBericht");
+                Date tijdStamp = resultSet.getDate("tijdStamp");
+                String berichtTekst = resultSet.getString("bericht");
+                int gebruikerId = resultSet.getInt("gebruiker_has_team_gebruiker_idGebruiker");
+                Bericht bericht = new Bericht(idBericht, tijdStamp, berichtTekst, gebruikerId, null);
+                berichten.add(bericht);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        for (Bericht bericht : berichten) {
+            bericht.toString();
+        }
+    }
+    public String getName () {
+        return teamNaam;
+    }
+
+    public void menu(Scanner scanner) {
+        while (true) {
+            System.out.println("\nTeam Menu: " + teamNaam);
+            System.out.println("1. Navigeer naar een Epic");
+            System.out.println("2. Terug");
+            System.out.print("Kies een optie: ");
+            int keuze;
+    
+            try {
+                keuze = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Ongeldige invoer. Voer een nummer in.");
+                continue;
+            }
+    
+            switch (keuze) {
+                case 1:
+                    navigeerNaarEpic(scanner);
+                    break;
+                case 2:
+                    Main.gaTerug();
+                    return;
+                default:
+                    System.out.println("Ongeldige keuze. Probeer opnieuw.");
+            }
+        }
+    }
+    
+    private void navigeerNaarEpic(Scanner scanner) {
+        if (epics.isEmpty()) {
+            System.out.println("Er zijn geen epics gekoppeld aan dit team.");
+            return;
+        }
+    
+        System.out.println("Beschikbare Epics:");
+        for (Epic epic : epics) {
+            System.out.println("- " + epic.getScrumItemNaam());
+        }
+    
+        System.out.println("Typ de naam van de Epic die u wilt bekijken of typ 'terug' om terug te gaan:");
+        String keuze = scanner.nextLine();
+    
+        if (keuze.equalsIgnoreCase("terug")) {
+            return;
+        }
+    
+        for (Epic epic : epics) {
+            if (epic.getScrumItemNaam().equalsIgnoreCase(keuze)) {
+                Main.navigationStack.push(epic);
+                return;
+            }
+        }
+    
+        System.out.println("Epic niet gevonden. Probeer opnieuw.");
     }
 }

@@ -115,6 +115,22 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
 
             statement.executeUpdate();
         }
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "SELECT idUserStory FROM Userstory WHERE UserStoryNaam = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, userstoryNaam);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                this.idUserStory = resultSet.getInt("idUserStory");
+            }
+        }
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "INSERT INTO gebruiker_has_Userstory (gebruiker_idGebruiker, Userstory_idUserstory) VALUES (?, ?)";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, Session.getActiveGebruiker().getIdGebruiker());
+            statement.setInt(2, this.idUserStory);
+            statement.executeUpdate();
+        }
 
         UserStory userstory = new UserStory (userstoryNaam, userstorybeschrijving);
         this.UserStories.add(userstory);
@@ -124,6 +140,86 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
 
     public ArrayList<UserStory> getUserStories() {
         return UserStories;
+    }
+
+    public void toonBerichten() {
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "SELECT * FROM Bericht_Epic WHERE Epic_has_gebruiker_Epic_idEpic = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, this.idEpic);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                int idBericht = resultSet.getInt("idBericht");
+                Date tijdStamp = resultSet.getDate("tijdStamp");
+                String bericht = resultSet.getString("bericht");
+                int gebruikerId = resultSet.getInt("Epic_has_gebruiker_gebruiker_idGebruiker");
+                Bericht berichtObject = new Bericht(idBericht, tijdStamp, bericht, gebruikerId, this);
+                berichten.add(berichtObject);
+            }
+        } catch (SQLException e) {
+
+        }
+
+        for (Bericht bericht : berichten) {
+            bericht.toString();
+        }
+
+    }
+
+    public void menu(Scanner scanner) {
+        while (true) {
+            System.out.println("\nEpic Menu: " + scrumItemNaam);
+            System.out.println("1. Navigeer naar een User Story");
+            System.out.println("2. Terug");
+            System.out.print("Kies een optie: ");
+            int keuze;
+
+            try {
+                keuze = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Ongeldige invoer. Voer een nummer in.");
+                continue;
+            }
+
+            switch (keuze) {
+                case 1:
+                    navigeerNaarUserStory(scanner);
+                    break;
+                case 2:
+                    Main.gaTerug();
+                    return;
+                default:
+                    System.out.println("Ongeldige keuze. Probeer opnieuw.");
+            }
+        }
+    }
+
+    private void navigeerNaarUserStory(Scanner scanner) {
+        if (UserStories.isEmpty()) {
+            System.out.println("Er zijn geen user stories gekoppeld aan deze epic.");
+            return;
+        }
+
+        System.out.println("Beschikbare User Stories:");
+        for (UserStory userStory : UserStories) {
+            System.out.println("- " + userStory.getScrumItemNaam());
+        }
+
+        System.out.println("Typ de naam van de User Story die u wilt bekijken of typ 'terug' om terug te gaan:");
+        String keuze = scanner.nextLine();
+
+        if (keuze.equalsIgnoreCase("terug")) {
+            return;
+        }
+
+        for (UserStory userStory : UserStories) {
+            if (userStory.getScrumItemNaam().equalsIgnoreCase(keuze)) {
+                Main.navigationStack.push(userStory);
+                return;
+            }
+        }
+
+        System.out.println("User Story niet gevonden. Probeer opnieuw.");
     }
 
 }

@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 public interface IMenu {
-    default void menu() {
+    default void menu(Scanner scanner) {
         System.out.println("you're not allowed to do this");
     }
     default void GebruikerAanmaken() {

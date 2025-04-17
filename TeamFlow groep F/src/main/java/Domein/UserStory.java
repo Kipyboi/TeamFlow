@@ -49,7 +49,7 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
         gebruiker.addScrumItem(ghsi);
         gebruikers.add(ghsi);
         try (Connection connection = DatabaseUtil.getConnection()) {
-            String query = "INSERT INTO Epic_has_gebruiker (gebruiker_idGebruiker, UserStory_idUserStory) VALUES (?, ?)";
+            String query = "INSERT INTO Epic_has_gebruiker (gebruiker_idGebruiker, Epic_idEpic) VALUES (?, ?)";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, gebruiker.getIdGebruiker());
             statement.setInt(2, this.idUserStory);
@@ -75,6 +75,22 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
 
             statement.executeUpdate();
         }
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "SELECT idTaken FROM taken WHERE TaakNaam = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, taakNaam);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                this.idUserStory = resultSet.getInt("idTaken");
+            }
+        }
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "INSERT INTO gebruiker_has_Taken (gebruiker_idGebruiker, Taken_idTaken) VALUES (?, ?)";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, session.getActiveGebruiker().getIdGebruiker());
+            statement.setInt(2, this.idUserStory);
+            statement.executeUpdate();
+        }
 
         Taken taak = new Taken(taakNaam, taakBeschrijving);
         this.taken.add(taak);
@@ -85,4 +101,79 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
     public ArrayList<Taken> getTaken() {
         return taken;
     }
+
+    public void toonBerichten() {
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "SELECT * FROM Bericht WHERE Userstory_idUserstory = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, this.idUserStory);
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                Bericht bericht = new Bericht(resultSet.getInt("idBericht"), resultSet.getDate("datum"), resultSet.getString("berichtTekst"), resultSet.getInt("gebruiker_idGebruiker"), this);
+                berichten.add(bericht);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        for (Bericht bericht : berichten) {
+            bericht.toString();
+        }
+    }
+
+    public void menu(Scanner scanner) {
+        while (true) {
+            System.out.println("\nUser Story Menu: " + scrumItemNaam);
+            System.out.println("1. Navigeer naar een Taak");
+            System.out.println("2. Terug");
+            System.out.print("Kies een optie: ");
+            int keuze;
+
+            try {
+                keuze = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Ongeldige invoer. Voer een nummer in.");
+                continue;
+            }
+
+            switch (keuze) {
+                case 1:
+                    navigeerNaarTaak(scanner);
+                    break;
+                case 2:
+                    Main.gaTerug();
+                    return;
+                default:
+                    System.out.println("Ongeldige keuze. Probeer opnieuw.");
+            }
+        }
+    }
+
+    private void navigeerNaarTaak(Scanner scanner) {
+        if (taken.isEmpty()) {
+            System.out.println("Er zijn geen taken gekoppeld aan deze user story.");
+            return;
+        }
+
+        System.out.println("Beschikbare Taken:");
+        for (Taken taak : taken) {
+            System.out.println("- " + taak.getScrumItemNaam());
+        }
+
+        System.out.println("Typ de naam van de Taak die u wilt bekijken of typ 'terug' om terug te gaan:");
+        String keuze = scanner.nextLine();
+
+        if (keuze.equalsIgnoreCase("terug")) {
+            return;
+        }
+
+        for (Taken taak : taken) {
+            if (taak.getScrumItemNaam().equalsIgnoreCase(keuze)) {
+                Main.navigationStack.push(taak);
+                return;
+            }
+        }
+
+        System.out.println("Taak niet gevonden. Probeer opnieuw.");
+    }
+
 }

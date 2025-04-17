@@ -5,6 +5,7 @@ import Utils.DatabaseUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Scanner;
 
 public class Taken extends ScrumItem{
     private int UserStory_idUserStory;
@@ -33,5 +34,27 @@ public class Taken extends ScrumItem{
         System.out.println("De taak is succesvol aan u toegewezen.");
     }
 
+    public void menu(Scanner scanner) {
+        while (true) {
+            System.out.println("\nTaak Menu: " + scrumItemNaam);
+            System.out.println("1. Terug");
+            System.out.print("Kies een optie: ");
+            int keuze;
 
+            try {
+                keuze = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Ongeldige invoer. Voer een nummer in.");
+                continue;
+            }
+
+            switch (keuze) {
+                case 1:
+                    Main.gaTerug();
+                    return;
+                default:
+                    System.out.println("Ongeldige keuze. Probeer opnieuw.");
+            }
+        }
+    }
 }

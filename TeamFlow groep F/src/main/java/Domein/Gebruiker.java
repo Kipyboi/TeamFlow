@@ -45,4 +45,7 @@ public class Gebruiker {
     public ArrayList<GebruikerHasScrumItem> getScrumItems() {
         return scrumItems;
     }
+    public ArrayList<GebruikerHasTeam> getTeams() {
+        return teams;
+    }
 }
