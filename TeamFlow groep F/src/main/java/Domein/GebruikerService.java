@@ -8,6 +8,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Scanner;
+
+import static Domein.Main.toonHoofdMenu;
 
 public class GebruikerService {
     private ArrayList<Gebruiker> gebruikers;
@@ -30,8 +33,17 @@ public class GebruikerService {
         gebruikers = fillGebruikersList();
     }
 
-    public  void gebruikerAanmaken () {
-        //shit
+    public void gebruikerAanmaken (Scanner scanner) throws SQLException {
+        System.out.println("Voer de gebruikersnaam van de nieuwe gebruiker in: ");
+        String gebruikersNaam = scanner.nextLine();
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "INSERT INTO gebruiker VALUE (?)";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, gebruikersNaam);
+            statement.executeUpdate();
+        }
+        System.out.println("Nieuwe gebruiker aangemaakt!");
+        toonHoofdMenu(scanner);
     }
 
     public boolean gebruikerInloggen (String gebruikersNaam) {
