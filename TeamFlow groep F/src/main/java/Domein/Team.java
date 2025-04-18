@@ -24,7 +24,25 @@ public class Team implements IZoek, IMenu {
         gebruikers = new ArrayList<>();
         epics = new ArrayList<>();
     }
-    public void gebruikerToevoegen(Gebruiker gebruiker) throws SQLException {
+    public void gebruikerToevoegen(Scanner scanner) throws SQLException {
+
+        System.out.println("Typ de naam in van de gebruiker die je wilt toevoegen.");
+        String gebruikersnaam = scanner.nextLine();
+        Gebruiker gebruiker = null;
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "SELECT * FROM gebruiker WHERE GebruikersNaam = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, gebruikersnaam);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                gebruiker = new Gebruiker(resultSet.getInt("idGebruiker"), resultSet.getString("gebruikersnaam"));
+
+            }
+            else {
+                System.out.println("Gebruiker niet gevonden.");
+                GebruikerBeheer(scanner);
+            }
+        }
         GebruikerHasTeam ght = new GebruikerHasTeam(gebruiker, this);
         gebruiker.addTeam(ght);
         gebruikers.add(ght);
@@ -34,22 +52,27 @@ public class Team implements IZoek, IMenu {
             statement.setInt(1, gebruiker.getIdGebruiker());
             statement.setInt(2, this.idTeam);
             statement.executeUpdate();
-
         }
+        System.out.println("Gebruiker toegevoegd!");
+        GebruikerBeheer(scanner);
     }
 
-    public void gebruikerVerwijderen(Gebruiker gebruiker, String gebruikersnaam) throws SQLException {
+    public void gebruikerVerwijderen(Scanner scanner) throws SQLException {
+        System.out.println("Typ de naam van de gebruiker die je wilt verwijderen.");
+        String gebruikersnaam = scanner.nextLine();
         for (GebruikerHasTeam ght : gebruikers) {
             if (ght.getGebruiker().getGebruikersNaam().equals(gebruikersnaam)) {
                 try (Connection connection = DatabaseUtil.getConnection()) {
                     String query = "DELETE FROM gebruiker_has_team WHERE gebruiker_idGebruiker = ? AND team_idteam = ?";
                     PreparedStatement statement = connection.prepareStatement(query);
-                    statement.setInt(1, gebruiker.getIdGebruiker());
+                    statement.setInt(1, ght.getGebruiker().getIdGebruiker());
                     statement.setInt(2, this.idTeam);
                     statement.executeUpdate();
                 }
                 ght.getGebruiker().removeTeam(ght);
                 gebruikers.remove(ght);
+                System.out.println("Gebruiker verwijderd!");
+                GebruikerBeheer(scanner);
             }
 
         }
