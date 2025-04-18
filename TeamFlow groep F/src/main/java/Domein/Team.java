@@ -168,6 +168,24 @@ public class Team implements IZoek, IMenu {
         Main.Contextmenu(scanner);
     }
 
+    public void EpicVerwijderen(Scanner scanner) throws SQLException {
+        System.out.println("Typ hieronder de naam van de epic die je wilt verwijderen (enter om te versturen): ");
+        String epicNaam = scanner.nextLine();
+
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "DELETE FROM Epic WHERE EpicNaam = ? AND team_idteam = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+
+            statement.setString(1, epicNaam);
+            statement.setInt(2, this.idTeam);
+
+            statement.executeUpdate();
+
+            this.epics.removeIf(e -> e.getNaam().equals(epicNaam));
+            System.out.println("Epic: " + epicNaam + " is verwijderd!");
+        }
+    }
+
     public void gaNaar (Scanner scanner) {
 
     }
