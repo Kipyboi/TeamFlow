@@ -8,7 +8,7 @@ import java.util.Scanner;
 import java.util.Stack;
 
 public class Main {
-    private static Stack<Object> navigationStack = new Stack<>();
+    public static Stack<Object> navigationStack = new Stack<>();
 
     public static void main(String[] args) throws SQLException {
         GebruikerService inlogservice = new GebruikerService();

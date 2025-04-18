@@ -4,6 +4,8 @@ import Utils.DatabaseUtil;
 import Utils.GeselecteerdTeamSession;
 import Utils.GeselecteerdeEpicSession;
 import Utils.Session;
+import java.util.List;
+import java.sql.ResultSet;
 
 import javax.xml.crypto.Data;
 import java.sql.Connection;
@@ -143,6 +145,7 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
     }
 
     public void toonBerichten() {
+        List<Bericht> berichten = new ArrayList<>();
         try (Connection connection = DatabaseUtil.getConnection()) {
             String query = "SELECT * FROM Bericht_Epic WHERE Epic_has_gebruiker_Epic_idEpic = ?";
             PreparedStatement statement = connection.prepareStatement(query);

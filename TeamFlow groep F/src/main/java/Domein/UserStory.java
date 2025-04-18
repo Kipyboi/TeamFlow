@@ -3,6 +3,8 @@ package Domein;
 import Utils.DatabaseUtil;
 import Utils.GeselecteerdeEpicSession;
 import Utils.GeselecteerdeUserStorySession;
+import java.util.List;
+import java.sql.ResultSet;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -103,6 +105,7 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
     }
 
     public void toonBerichten() {
+        List<Bericht> berichten = new ArrayList<>();
         try (Connection connection = DatabaseUtil.getConnection()) {
             String query = "SELECT * FROM Bericht WHERE Userstory_idUserstory = ?";
             PreparedStatement statement = connection.prepareStatement(query);

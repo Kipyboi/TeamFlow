@@ -3,6 +3,7 @@ package Domein;
 import Utils.DatabaseUtil;
 import Utils.GeselecteerdTeamSession;
 import Utils.Session;
+import java.util.List;
 
 import javax.xml.crypto.Data;
 import java.sql.Connection;
@@ -165,6 +166,7 @@ public class Team implements IZoek, IMenu {
     }
 
     public void toonBerichten() {
+        List<Bericht> berichten = new ArrayList<>(); // Declare and initialize the list
         try (Connection connection = DatabaseUtil.getConnection()) {
             String query = "SELECT * FROM Bericht_Team WHERE gebruiker_has_team_team_idTeam = ?";
             PreparedStatement statement = connection.prepareStatement(query);
@@ -183,7 +185,7 @@ public class Team implements IZoek, IMenu {
         }
 
         for (Bericht bericht : berichten) {
-            bericht.toString();
+            System.out.println(bericht.toString()); // Print the string representation of each Bericht
         }
     }
     public String getName () {
