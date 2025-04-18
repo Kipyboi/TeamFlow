@@ -3,14 +3,11 @@ package Domein;
 import Utils.DatabaseUtil;
 import Utils.GeselecteerdTeamSession;
 import Utils.Session;
+
+import java.sql.*;
 import java.util.List;
 
 import javax.xml.crypto.Data;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -198,6 +195,7 @@ public class Team implements IZoek, IMenu {
             System.out.println("\nTeam Menu: " + teamNaam);
             System.out.println("1. Navigeer naar een Epic");
             System.out.println("2. Terug");
+            System.out.println("3. Gebruiker Beheren");
             System.out.print("Kies een optie: ");
             int keuze;
     
@@ -214,7 +212,14 @@ public class Team implements IZoek, IMenu {
                     break;
                 case 2:
                     Main.gaTerug();
+                    try {
+                        Main.Contextmenu(scanner);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                     return;
+                case 3:
+
                 default:
                     System.out.println("Ongeldige keuze. Probeer opnieuw.");
             }
@@ -222,6 +227,22 @@ public class Team implements IZoek, IMenu {
     }
     
     private void navigeerNaarEpic(Scanner scanner) {
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "SELECT * FROM Epic WHERE team_idteam = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, this.idTeam);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                int idEpic = resultSet.getInt("idEpic");
+                String epicNaam = resultSet.getString("EpicNaam");
+                String epicBeschrijving = resultSet.getString("EpicBeschrijving");
+                Epic epic = new Epic(idEpic, epicNaam, epicBeschrijving);
+                epics.add(epic);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         if (epics.isEmpty()) {
             System.out.println("Er zijn geen epics gekoppeld aan dit team.");
             return;
@@ -232,13 +253,30 @@ public class Team implements IZoek, IMenu {
             System.out.println("- " + epic.getScrumItemNaam());
         }
     
-        System.out.println("Typ de naam van de Epic die u wilt bekijken of typ 'terug' om terug te gaan:");
+        System.out.println("Typ de naam van de Epic die u wilt bekijken typ 'terug' om terug te gaan 'aanmaken' om een epic aan te maken 'verwijder' om een epic te verwijderen of typ de naam van een epic om naar de epic tegaan:");
         String keuze = scanner.nextLine();
     
         if (keuze.equalsIgnoreCase("terug")) {
+            menu(scanner);
             return;
+        } else if (keuze.equalsIgnoreCase('aanmaken')) {
+            // maak een nieuwe epic aan
+            EpicAanmaken(scanner);
+            return;
+        } else if (keuze.equalsIgnoreCase('verwijder')) {
+            // verwijder een epic
+            EpicVerwijderen(scanner);
+            return;
+        } else {
+            // ga naar de epic
+            for (Epic epic : epics) {
+                if (epic.getScrumItemNaam().equalsIgnoreCase(keuze)) {
+                    Main.navigationStack.push(epic);
+                    return;
+                }
+            }
         }
-    
+
         for (Epic epic : epics) {
             if (epic.getScrumItemNaam().equalsIgnoreCase(keuze)) {
                 Main.navigationStack.push(epic);
@@ -247,5 +285,28 @@ public class Team implements IZoek, IMenu {
         }
     
         System.out.println("Epic niet gevonden. Probeer opnieuw.");
+    }
+    public void GebruikerBeheer(Scanner scanner) throws sqlException {
+        for (GebruikerHasTeam gebruiker : gebruikers) {
+            System.out.println("- "gebruiker.getGebruiker().getGebruikersNaam());
+        }
+        System.out.println("Typ verwijder om een gebruiker te verwijderen typ toevoegen om een gebruiker toe te voegen of typ terug om terug te gaan");
+        String keuze = scanner.nextLine();
+        if (keuze.equalsIgnoreCase("terug")) {
+            menu(scanner);
+            return;
+        } else if (keuze.equalsIgnoreCase("verwijder")) {
+            gebruikerVerwijderen(scanner);
+            return;
+        }else if (keuze.equalsIgnoreCase("toevoegen")) {
+            gebruikerToevoegen(scanner);
+            return;
+        }else {
+            System.out.println("Ongeldige keuze. Probeer opnieuw.");
+            GebruikerBeheer(scanner);
+            return;
+        }
+
+
     }
 }
