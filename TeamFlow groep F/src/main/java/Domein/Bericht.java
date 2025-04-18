@@ -12,6 +12,8 @@ public class Bericht {
     private int idGebruiker;
     private ScrumItem gekoppeldItem;
 
+    //test voor hugo
+
     public Bericht(int idBericht, Date tijdStamp, String bericht, int idGebruiker, ScrumItem gekoppeldItem) {
         this.idBericht = idBericht;
         this.tijdStamp = tijdStamp;
