@@ -59,35 +59,43 @@ public class Main {
                     break;
                 case 3:
                     System.out.println("Programma afgesloten.");
-                    return;
+                    System.exit(0);
+                    break;
                 default:
                     System.out.println("Ongeldige keuze. Probeer het opnieuw.");
             }
         }
     }
 
-    private static void toonTeams(Scanner scanner) {
-        ArrayList<GebruikerHasTeam> teams = Session.getActiveGebruiker().getTeams();
-        if (teams.isEmpty()) {
+    private static void toonTeams(Scanner scanner) throws SQLException {
+        ArrayList<Team> teams = new ArrayList<>();
+        try {
+            for (GebruikerHasTeam ght : Session.getActiveGebruiker().getTeams()) {
+                Team team = ght.getTeam();
+                teams.add(team);
+            }
+        } catch (NullPointerException e) {
             System.out.println("Er zijn geen teams gekoppeld aan deze gebruiker.");
-            return;
+            //return;
         }
 
+
         System.out.println("Beschikbare teams:");
-        for (GebruikerHasTeam team : teams) {
-            System.out.println("- " + team.getTeam().getName());
+        for (Team team : teams) {
+            System.out.println("- " + team.getName());
         }
 
         System.out.println("Typ de naam van het team dat u wilt bekijken of typ 'terug' om terug te gaan:");
         String keuze = scanner.nextLine();
 
         if (keuze.equalsIgnoreCase("terug")) {
+            toonHoofdMenu(scanner);
             return;
         }
 
-        for (GebruikerHasTeam team : teams) {
-            if (team.getTeam().getName().equalsIgnoreCase(keuze)) {
-                navigationStack.push(team.getTeam());
+        for (Team team : teams) {
+            if (team.getName().equalsIgnoreCase(keuze)) {
+                navigationStack.push(team);
                 return;
             }
         }
