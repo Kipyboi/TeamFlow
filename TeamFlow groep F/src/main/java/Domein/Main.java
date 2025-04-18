@@ -110,14 +110,14 @@ public class Main {
             System.out.println("- " + team.getName());
         }
 
-        System.out.println("Typ de naam van het team dat u wilt bekijken of typ 'terug' om terug te gaan of typ 'aanmaak' om een team aan temaken:");
+        System.out.println("Typ de naam van het team dat u wilt bekijken of typ 'terug' om terug te gaan of typ 'aanmaken' om een team aan temaken:");
         String keuze = scanner.nextLine();
 
         if (keuze.equalsIgnoreCase("terug")) {
             toonHoofdMenu(scanner);
             return;
         }
-        if (keuze.equalsIgnoreCase("aanmaak")) {
+        if (keuze.equalsIgnoreCase("aanmaken")) {
             maakTeamAan(scanner);
             return;
         }
