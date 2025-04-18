@@ -305,4 +305,38 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
         Main.Contextmenu(scanner);
     }
 
+    public void toonUserStories(Scanner scanner) {
+        ArrayList<UserStory> userStories = this.getUserStories();
+
+        if (userStories == null || userStories.isEmpty()) {
+            System.out.println("Deze Epic heeft nog geen User Stories.");
+            return;
+        }
+
+        System.out.println("User Stories voor deze Epic:");
+        int num = 1;
+        for (UserStory us : userStories) {
+            System.out.println("   " + num + ". " + us.getScrumItemNaam());
+            num++;
+        }
+        System.out.print("Typ het nummer van de User Story die je verder wilt bekijken: ");
+        int keuze = -1;
+        try {
+            keuze = Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Ongeldige invoer.");
+            return;
+        }
+
+        if (keuze < 1 || keuze > userStories.size()) {
+            System.out.println("Ongeldige keuze.");
+            return;
+        }
+
+        UserStory gekozenUser = userStories.get(keuze - 1);
+        gekozenUser.toonTaken(scanner);
+
+    }
+
+
 }

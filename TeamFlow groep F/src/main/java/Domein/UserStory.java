@@ -241,6 +241,69 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
         System.out.println("Taak niet gevonden. Probeer opnieuw.");
         Main.Contextmenu(scanner);
     }
+
+    public void toonTaken(Scanner scanner) {
+        ArrayList<Taken> taken = this.getTaken();
+
+        if (taken == null || taken.isEmpty()) {
+            System.out.println("Deze User Story heeft nog geen taken.");
+            return;
+        }
+        while (true) {
+            System.out.println("Taken voor deze User Story:");
+            int num = 1;
+            for (Taken taak : taken) {
+                System.out.println("Status: " + taak.getStatus());
+                System.out.println(num + ". " + taak.getScrumItemNaam());
+                System.out.println("   - " + taak.beschrijving);
+                System.out.println();
+                num++;
+            }
+
+            System.out.print("Wil je de status van de taak veranderen? (ja/nee): ");
+            String antwoord = scanner.nextLine();
+
+            if (antwoord.equalsIgnoreCase("ja")) {
+                System.out.print("Typ het nummer van de taak waarvan je de status wilt veranderen: ");
+                try {
+                    int keuze = Integer.parseInt(scanner.nextLine());
+                    if (keuze < 1 || keuze > taken.size()) {
+                        System.out.println("Ongeldige keuze.");
+                        return;
+                    }
+
+                    Taken gekozenTaak = taken.get(keuze - 1);
+                    System.out.println("Huidige status van " + gekozenTaak.getScrumItemNaam() + ": " + gekozenTaak.getStatus());
+                    System.out.println("Wat wordt de nieuwe status?");
+                    System.out.println("0 = Open, 1 = Bezig, 2 = Klaar");
+
+                    int nieuweStatus = Integer.parseInt(scanner.nextLine());
+                    if (nieuweStatus < 0 || nieuweStatus > 2) {
+                        System.out.println("Ongeldige status. Kies 0, 1 of 2.");
+                        return;
+                    }
+
+                    gekozenTaak.setStatus(nieuweStatus);
+                    System.out.println("Status succesvol aangepast naar: " + gekozenTaak.getStatus());
+
+                } catch (NumberFormatException e) {
+                    System.out.println("Ongeldige invoer. Gebruik een getal.");
+                }
+            } else {
+                System.out.println("Terug naar het menu.");
+                return;
+            }
+            System.out.println("Wil je nog een status aanpassen? (ja/nee)");
+            String nogEen = scanner.nextLine();
+            if (nogEen.equals("nee")) {
+                break;
+            }
+        }
+        System.out.println("Je gaat nu terug naar het menu");
+        return;
+    }
+
+
     @Override
     public void BerichtAanmaken (Scanner scanner) throws SQLException {
         boolean toegewezen = false;
