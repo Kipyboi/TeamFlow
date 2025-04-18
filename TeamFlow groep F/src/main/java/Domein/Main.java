@@ -1,7 +1,11 @@
 package Domein;
 
+import Utils.DatabaseUtil;
 import Utils.Session;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -76,6 +80,20 @@ public class Main {
 
     private static void toonTeams(Scanner scanner) throws SQLException {
         ArrayList<Team> teams = new ArrayList<>();
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "SELECT * FROM team " +
+                    "JOIN gebruiker_has_team ON team.idTeam = " +
+                    "gebruiker_has_team.team_idTeam " +
+                    "WHERE gebruiker_idGebruiker = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, Session.getActiveGebruiker().getIdGebruiker());
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                Team team = new Team(resultSet.getInt("idTeam"), resultSet.getString("TeamNaam"));
+                GebruikerHasTeam ght = new GebruikerHasTeam(Session.getActiveGebruiker(), team);
+                Session.getActiveGebruiker().addTeam(ght);
+            }
+        }
         try {
             for (GebruikerHasTeam ght : Session.getActiveGebruiker().getTeams()) {
                 Team team = ght.getTeam();
