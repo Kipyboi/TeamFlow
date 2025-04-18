@@ -25,26 +25,26 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
         super(scrumItemNaam, beschrijving);
     }
 
-    @Override
-    public void zoek(Scanner scanner) {
-        System.out.println("Typ hieronder de naam in van de taak die u zoekt");
-        String zoekterm = scanner.nextLine();
-        UserStory geselecteerdeUserStory = GeselecteerdeUserStorySession.getGeselecteerdeUserStory();
-        for (Taken t : geselecteerdeUserStory.getTaken()) {
-            if (t.getScrumItemNaam().toLowerCase().contains(zoekterm.toLowerCase())) {
-                System.out.println(t.getScrumItemNaam());
-                System.out.println();
-            }
-        }
-        System.out.println("Typ de naam van de epic die u wilt bekijken.");
-        String usNaam = scanner.nextLine();
-        for (Taken t : geselecteerdeUserStory.getTaken()) {
-            if (t.getScrumItemNaam().equalsIgnoreCase(usNaam)) {
-                t.gaNaar(scanner);
-            }
-        }
-
-    }
+//    @Override
+//    public void zoek(Scanner scanner) {
+//        System.out.println("Typ hieronder de naam in van de taak die u zoekt");
+//        String zoekterm = scanner.nextLine();
+//        UserStory geselecteerdeUserStory = GeselecteerdeUserStorySession.getGeselecteerdeUserStory();
+//        for (Taken t : geselecteerdeUserStory.getTaken()) {
+//            if (t.getScrumItemNaam().toLowerCase().contains(zoekterm.toLowerCase())) {
+//                System.out.println(t.getScrumItemNaam());
+//                System.out.println();
+//            }
+//        }
+//        System.out.println("Typ de naam van de epic die u wilt bekijken.");
+//        String usNaam = scanner.nextLine();
+//        for (Taken t : geselecteerdeUserStory.getTaken()) {
+//            if (t.getScrumItemNaam().equalsIgnoreCase(usNaam)) {
+//                t.gaNaar(scanner);
+//            }
+//        }
+//
+//    }
     public void gebruikerToewijzen (Gebruiker gebruiker) throws SQLException {
         GebruikerHasScrumItem ghsi = new GebruikerHasScrumItem(gebruiker, this);
         gebruiker.addScrumItem(ghsi);
@@ -67,7 +67,7 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
         String taakBeschrijving = scanner.nextLine();
 
         try (Connection connection = DatabaseUtil.getConnection()) {
-            String query = "INSERT INTO taken (TaakNaam, Userstory_idUserstory, TaakBeschrijving) VALUES (?, ?, ?)";
+            String query = "INSERT INTO Taken (TaakNaam, Userstory_idUserstory, TaakBeschrijving) VALUES (?, ?, ?)";
             PreparedStatement statement = connection.prepareStatement(query);
 
             statement.setString(1, taakNaam);
@@ -78,7 +78,7 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
         }
         int idTaken = -1;
         try (Connection connection = DatabaseUtil.getConnection()) {
-            String query = "SELECT idTaken FROM taken WHERE TaakNaam = ?";
+            String query = "SELECT idTaken FROM Taken WHERE TaakNaam = ?";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, taakNaam);
             ResultSet resultSet = statement.executeQuery();
@@ -167,7 +167,7 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
 
     private void navigeerNaarTaak(Scanner scanner) throws SQLException {
         try (Connection connection = DatabaseUtil.getConnection()) {
-            String query = "SELECT * FROM taken WHERE Userstory_idUserstory = ?";
+            String query = "SELECT * FROM Taken WHERE Userstory_idUserstory = ?";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, this.idUserStory);
             ResultSet resultSet = statement.executeQuery();
@@ -183,14 +183,13 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        if (taken.isEmpty()) {
+        if (taken == null || taken.isEmpty()) {
             System.out.println("Er zijn geen taken gekoppeld aan deze user story.");
-            return;
-        }
-
-        System.out.println("Beschikbare Taken:");
-        for (Taken taak : taken) {
-            System.out.println("- " + taak.getScrumItemNaam());
+        }else {
+            System.out.println("Beschikbare Taken:");
+            for (Taken taak : taken) {
+                System.out.println("- " + taak.getScrumItemNaam());
+            }
         }
 
         System.out.println("Typ de naam van de Taak die u wilt bekijken typ 'terug' om terug tegaan typ 'verwijder' om een taak te verwijderen of typ 'aanmaken' om een taak aan te maken:");

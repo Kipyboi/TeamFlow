@@ -79,26 +79,26 @@ public class Team implements IZoek, IMenu {
 
 
 
-    public void zoek (Scanner scanner) throws SQLException {
-        System.out.println("Typ hieronder de naam in van de epic die u zoekt");
-        String zoekterm = scanner.nextLine();
-        Team geselecteerdTeam = GeselecteerdTeamSession.getGeselecteerdTeam();
-        for (Epic epic : geselecteerdTeam.getEpics()) {
-            if (epic.getScrumItemNaam().toLowerCase().contains(zoekterm.toLowerCase())) {
-                System.out.println(epic.getScrumItemNaam());
-                System.out.println();
-            }
-        }
-        System.out.println("Typ de naam van de epic die u wilt bekijken.");
-        String epicNaam = scanner.nextLine();
-        for (Epic epic : geselecteerdTeam.getEpics()) {
-            if (epic.getScrumItemNaam().equalsIgnoreCase(epicNaam)) {
-                epic.menu(scanner);
-            }
-        }
-
-
-    }
+//    public void zoek (Scanner scanner) throws SQLException {
+//        System.out.println("Typ hieronder de naam in van de epic die u zoekt");
+//        String zoekterm = scanner.nextLine();
+//        Team geselecteerdTeam = GeselecteerdTeamSession.getGeselecteerdTeam();
+//        for (Epic epic : geselecteerdTeam.getEpics()) {
+//            if (epic.getScrumItemNaam().toLowerCase().contains(zoekterm.toLowerCase())) {
+//                System.out.println(epic.getScrumItemNaam());
+//                System.out.println();
+//            }
+//        }
+//        System.out.println("Typ de naam van de epic die u wilt bekijken.");
+//        String epicNaam = scanner.nextLine();
+//        for (Epic epic : geselecteerdTeam.getEpics()) {
+//            if (epic.getScrumItemNaam().equalsIgnoreCase(epicNaam)) {
+//                epic.menu(scanner);
+//            }
+//        }
+//
+//
+//    }
     public void BerichtAanmaken (Scanner scanner) throws SQLException {
         System.out.println("Typ hieronder het bericht dat je wilt posten (enter om te versturen): ");
         String berichtTekst = scanner.nextLine();
@@ -166,24 +166,6 @@ public class Team implements IZoek, IMenu {
 
         System.out.println("Epic: " + epicNaam + " toegevoegd!");
         Main.Contextmenu(scanner);
-    }
-
-    public void EpicVerwijderen(Scanner scanner) throws SQLException {
-        System.out.println("Typ hieronder de naam van de epic die je wilt verwijderen (enter om te versturen): ");
-        String epicNaam = scanner.nextLine();
-
-        try (Connection connection = DatabaseUtil.getConnection()) {
-            String query = "DELETE FROM Epic WHERE EpicNaam = ? AND team_idteam = ?";
-            PreparedStatement statement = connection.prepareStatement(query);
-
-            statement.setString(1, epicNaam);
-            statement.setInt(2, this.idTeam);
-
-            statement.executeUpdate();
-
-            this.epics.removeIf(e -> e.getNaam().equals(epicNaam));
-            System.out.println("Epic: " + epicNaam + " is verwijderd!");
-        }
     }
 
     public void gaNaar (Scanner scanner) {
@@ -297,7 +279,6 @@ public class Team implements IZoek, IMenu {
         }
         if (epics.isEmpty()) {
             System.out.println("Er zijn geen epics gekoppeld aan dit team.");
-            return;
         }
     
         System.out.println("Beschikbare Epics:");
