@@ -1,7 +1,6 @@
 package Domein;
 
 import Utils.DatabaseUtil;
-import Utils.GeselecteerdTeamSession;
 import Utils.Session;
 
 import java.sql.*;
@@ -80,7 +79,7 @@ public class Team implements IZoek, IMenu {
 
 
 
-    public void zoek (Scanner scanner) {
+    public void zoek (Scanner scanner) throws SQLException {
         System.out.println("Typ hieronder de naam in van de epic die u zoekt");
         String zoekterm = scanner.nextLine();
         Team geselecteerdTeam = GeselecteerdTeamSession.getGeselecteerdTeam();
@@ -94,7 +93,7 @@ public class Team implements IZoek, IMenu {
         String epicNaam = scanner.nextLine();
         for (Epic epic : geselecteerdTeam.getEpics()) {
             if (epic.getScrumItemNaam().equalsIgnoreCase(epicNaam)) {
-                epic.gaNaar(scanner);
+                epic.menu(scanner);
             }
         }
 
@@ -122,7 +121,7 @@ public class Team implements IZoek, IMenu {
 
         Bericht bericht = new Bericht(-1, sqlDate, berichtTekst, Session.getActiveGebruiker().getIdGebruiker(), null);
         System.out.println("Bericht aangemaakt!");
-        GeselecteerdTeamSession.getGeselecteerdTeam().gaNaar(scanner);
+        Main.Contextmenu(scanner);
     }
 
     @Override
@@ -162,12 +161,11 @@ public class Team implements IZoek, IMenu {
         }
 
 
-        // later op terug komen
-        // waarom heeft epic geen beschijving en naam het heeft aleen een naam, maar in database heeft het beide???
         Epic epic = new Epic(idEpic, epicNaam, epicbeschrijving);
         this.epics.add(epic);
 
         System.out.println("Epic: " + epicNaam + " toegevoegd!");
+        Main.Contextmenu(scanner);
     }
 
     public void gaNaar (Scanner scanner) {
@@ -186,7 +184,7 @@ public class Team implements IZoek, IMenu {
         return epics;
     }
 
-    public void toonBerichten() {
+    public void toonBerichten(Scanner scanner) throws SQLException {
         List<Bericht> berichten = new ArrayList<>(); // Declare and initialize the list
         try (Connection connection = DatabaseUtil.getConnection()) {
             String query = "SELECT * FROM Bericht_Team WHERE gebruiker_has_team_team_idTeam = ?";
@@ -208,17 +206,27 @@ public class Team implements IZoek, IMenu {
         for (Bericht bericht : berichten) {
             System.out.println(bericht.toString()); // Print the string representation of each Bericht
         }
+        System.out.println("Typ posten om een nieuw bericht aan te maken of typ terug om terug te gaan");
+        String keuze = scanner.nextLine();
+
+        if (keuze.equalsIgnoreCase("posten")) {
+            BerichtAanmaken(scanner);
+        }
+        else if (keuze.equalsIgnoreCase("terug")) {
+            Main.Contextmenu(scanner);
+        }
     }
     public String getName () {
         return teamNaam;
     }
 
-    public void menu(Scanner scanner) {
+    public void menu(Scanner scanner) throws SQLException {
         while (true) {
             System.out.println("\nTeam Menu: " + teamNaam);
             System.out.println("1. Navigeer naar een Epic");
-            System.out.println("2. Terug");
-            System.out.println("3. Gebruiker Beheren");
+            System.out.println("2. Toon berichten");
+            System.out.println("3. Terug");
+            System.out.println("4. Gebruikers beheren");
             System.out.print("Kies een optie: ");
             int keuze;
     
@@ -234,6 +242,8 @@ public class Team implements IZoek, IMenu {
                     navigeerNaarEpic(scanner);
                     break;
                 case 2:
+                    toonBerichten(scanner);
+                case 3:
                     Main.gaTerug();
                     try {
                         Main.Contextmenu(scanner);
@@ -241,15 +251,16 @@ public class Team implements IZoek, IMenu {
                         e.printStackTrace();
                     }
                     return;
-                case 3:
-
+                case 4:
+                    GebruikerBeheer(scanner);
+                    break;
                 default:
                     System.out.println("Ongeldige keuze. Probeer opnieuw.");
             }
         }
     }
     
-    private void navigeerNaarEpic(Scanner scanner) {
+    private void navigeerNaarEpic(Scanner scanner) throws SQLException {
         try (Connection connection = DatabaseUtil.getConnection()) {
             String query = "SELECT * FROM Epic WHERE team_idteam = ?";
             PreparedStatement statement = connection.prepareStatement(query);
@@ -280,13 +291,13 @@ public class Team implements IZoek, IMenu {
         String keuze = scanner.nextLine();
     
         if (keuze.equalsIgnoreCase("terug")) {
-            menu(scanner);
+            Main.Contextmenu(scanner);
             return;
-        } else if (keuze.equalsIgnoreCase('aanmaken')) {
+        } else if (keuze.equalsIgnoreCase("aanmaken")) {
             // maak een nieuwe epic aan
             EpicAanmaken(scanner);
             return;
-        } else if (keuze.equalsIgnoreCase('verwijder')) {
+        } else if (keuze.equalsIgnoreCase("verwijder")) {
             // verwijder een epic
             EpicVerwijderen(scanner);
             return;
@@ -295,28 +306,45 @@ public class Team implements IZoek, IMenu {
             for (Epic epic : epics) {
                 if (epic.getScrumItemNaam().equalsIgnoreCase(keuze)) {
                     Main.navigationStack.push(epic);
+                    Main.Contextmenu(scanner);
                     return;
                 }
             }
         }
 
-        for (Epic epic : epics) {
-            if (epic.getScrumItemNaam().equalsIgnoreCase(keuze)) {
-                Main.navigationStack.push(epic);
-                return;
-            }
-        }
     
         System.out.println("Epic niet gevonden. Probeer opnieuw.");
     }
-    public void GebruikerBeheer(Scanner scanner) throws sqlException {
+
+    private void EpicVerwijderen(Scanner scanner) throws SQLException {
+        System.out.println("Typ de naam van de epic die je wilt verwijderen");
+        String epicNaam = scanner.nextLine();
+        for (Epic epic : epics) {
+            if (epic.getScrumItemNaam().equalsIgnoreCase(epicNaam)) {
+                try (Connection connection = DatabaseUtil.getConnection()) {
+                    String query = "DELETE FROM Epic WHERE idEpic = ?";
+                    PreparedStatement statement = connection.prepareStatement(query);
+                    statement.setInt(1, epic.getIdScrumItem());
+                    statement.executeUpdate();
+                }
+
+                epics.remove(epic);
+                System.out.println("Epic succesvol verwijderd");
+                Main.Contextmenu(scanner);
+            }
+        }
+        System.out.println("Epic niet gevonden. Probeer opnieuw.");
+        Main.Contextmenu(scanner);
+    }
+
+    public void GebruikerBeheer(Scanner scanner) throws SQLException {
         for (GebruikerHasTeam gebruiker : gebruikers) {
-            System.out.println("- "gebruiker.getGebruiker().getGebruikersNaam());
+            System.out.println("- " + gebruiker.getGebruiker().getGebruikersNaam());
         }
         System.out.println("Typ verwijder om een gebruiker te verwijderen typ toevoegen om een gebruiker toe te voegen of typ terug om terug te gaan");
         String keuze = scanner.nextLine();
         if (keuze.equalsIgnoreCase("terug")) {
-            menu(scanner);
+            Main.Contextmenu(scanner);
             return;
         } else if (keuze.equalsIgnoreCase("verwijder")) {
             gebruikerVerwijderen(scanner);

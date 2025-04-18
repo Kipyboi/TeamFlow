@@ -1,16 +1,13 @@
 package Domein;
 
 import Utils.DatabaseUtil;
-import Utils.GeselecteerdeEpicSession;
-import Utils.GeselecteerdeUserStorySession;
 import Utils.Session;
-import java.util.List;
-import java.sql.ResultSet;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
+import java.sql.*;
+import java.time.LocalDate;
+import java.util.List;
+
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -107,10 +104,10 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
         return taken;
     }
 
-    public void toonBerichten() {
+    public void toonBerichten(Scanner scanner) throws SQLException {
         List<Bericht> berichten = new ArrayList<>();
         try (Connection connection = DatabaseUtil.getConnection()) {
-            String query = "SELECT * FROM Bericht_Userstory WHERE Userstory_idUserstory = ?";
+            String query = "SELECT * FROM Bericht_Userstory WHERE gebruiker_has_Userstory_Userstory_idUserstory = ?";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, this.idUserStory);
             ResultSet resultSet = statement.executeQuery();
@@ -124,13 +121,24 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
         for (Bericht bericht : berichten) {
             bericht.toString();
         }
+        System.out.println("-- Typ posten om een nieuw bericht aan te maken of typ terug om terug te gaan --");
+        String keuze = scanner.nextLine();
+
+        if (keuze.equalsIgnoreCase("posten")) {
+            BerichtAanmaken(scanner);
+        }
+        else if (keuze.equalsIgnoreCase("terug")) {
+            Main.Contextmenu(scanner);
+        }
     }
 
-    public void menu(Scanner scanner) {
+
+    public void menu(Scanner scanner) throws SQLException {
         while (true) {
             System.out.println("\nUser Story Menu: " + scrumItemNaam);
             System.out.println("1. Navigeer naar een Taak");
-            System.out.println("2. Terug");
+            System.out.println("2. Toon berichten");
+            System.out.println("3. Terug");
             System.out.print("Kies een optie: ");
             int keuze;
 
@@ -146,6 +154,9 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
                     navigeerNaarTaak(scanner);
                     break;
                 case 2:
+                    toonBerichten(scanner);
+                    break;
+                case 3:
                     Main.gaTerug();
                     return;
                 default:
@@ -154,7 +165,7 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
         }
     }
 
-    private void navigeerNaarTaak(Scanner scanner) {
+    private void navigeerNaarTaak(Scanner scanner) throws SQLException {
         try (Connection connection = DatabaseUtil.getConnection()) {
             String query = "SELECT * FROM taken WHERE Userstory_idUserstory = ?";
             PreparedStatement statement = connection.prepareStatement(query);
@@ -186,13 +197,13 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
         String keuze = scanner.nextLine();
 
         if (keuze.equalsIgnoreCase("terug")) {
-            menu(scanner);
+            Main.Contextmenu(scanner);
             return;
-        } else if (keuze.equalsIgnoreCase('verwijder')) {
+        } else if (keuze.equalsIgnoreCase("verwijder")) {
 //            taak verwijderen
             TaakVerwijderen(scanner);
             return;
-        } else if (keuze.equalsIgnoreCase('aanmaken')) {
+        } else if (keuze.equalsIgnoreCase("aanmaken")) {
 //            taak aanmaken
             TaakAanmaken(scanner);
             return;
@@ -211,4 +222,64 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
         System.out.println("Taak niet gevonden. Probeer opnieuw.");
     }
 
-}
+    private void TaakVerwijderen(Scanner scanner) throws SQLException {
+        System.out.println("Typ de naam van de taak die je wilt verwijderen.");
+        String usNaam = scanner.nextLine();
+        for (Taken taak : taken) {
+            if (taak.getScrumItemNaam().equalsIgnoreCase(usNaam)) {
+                try (Connection connection = DatabaseUtil.getConnection()) {
+                    String query = "DELETE FROM Taken WHERE idTaken = ?";
+                    PreparedStatement statement = connection.prepareStatement(query);
+                    statement.setInt(1, taak.getIdScrumItem());
+                    statement.executeUpdate();
+                }
+
+                taken.remove(taak);
+                System.out.println("Taak succesvol verwijderd");
+                Main.Contextmenu(scanner);
+            }
+        }
+        System.out.println("Taak niet gevonden. Probeer opnieuw.");
+        Main.Contextmenu(scanner);
+    }
+    @Override
+    public void BerichtAanmaken (Scanner scanner) throws SQLException {
+        boolean toegewezen = false;
+        for (GebruikerHasScrumItem ghsi : Session.getActiveGebruiker().getScrumItems()) {
+            if (ghsi.getScrumItem().getGebruikers().contains(Session.getActiveGebruiker())) {
+                toegewezen = true;
+            }
+        }
+
+        if (toegewezen) {
+            System.out.println("Typ hieronder het bericht dat je wilt posten (enter om te versturen): ");
+            String berichtTekst = scanner.nextLine();
+
+            LocalDate currentDate = LocalDate.now();
+            Date sqlDate = Date.valueOf(currentDate);
+
+            try (Connection connection = DatabaseUtil.getConnection()) {
+                String query = "INSERT INTO Bericht_Userstory " +
+                        "(tijdStamp, bericht, gebruiker_has_Userstory_gebruiker_idGebruiker, " +
+                        "gebruiker_has_Userstory_Userstory_idUserstory)" +
+                        " VALUES (?, ?, ?, ?)";
+                PreparedStatement statement = connection.prepareStatement(query);
+                statement.setDate(1, sqlDate);
+                statement.setString(2, berichtTekst);
+                statement.setInt(3, Session.getActiveGebruiker().getIdGebruiker());
+                statement.setInt(4, this.idUserStory);
+                statement.executeUpdate();
+            }
+
+            Bericht bericht = new Bericht(-1, sqlDate, berichtTekst, Session.getActiveGebruiker().getIdGebruiker(), this);
+            System.out.println("Bericht gepost!");
+            Main.Contextmenu(scanner);
+        }
+        else {
+            System.out.println("U bent niet toegewezen aan deze userstory en kan er daarom geen berichten over posten.");
+            Main.Contextmenu(scanner);
+        }
+    }
+    }
+
+

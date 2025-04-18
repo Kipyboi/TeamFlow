@@ -1,8 +1,6 @@
 package Domein;
 
 import Utils.DatabaseUtil;
-import Utils.GeselecteerdTeamSession;
-import Utils.GeselecteerdeEpicSession;
 import Utils.Session;
 import java.util.List;
 import java.sql.ResultSet;
@@ -89,11 +87,11 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
 
             Bericht bericht = new Bericht(-1, sqlDate, berichtTekst, Session.getActiveGebruiker().getIdGebruiker(), this);
             System.out.println("Bericht gepost!");
-            GeselecteerdeEpicSession.getGeselecteerdeEpic().gaNaar(scanner);
+            Main.Contextmenu(scanner);
         }
         else {
             System.out.println("U bent niet toegewezen aan deze epic en kan er daarom geen berichten over posten.");
-            GeselecteerdeEpicSession.getGeselecteerdeEpic().gaNaar(scanner);
+           Main.Contextmenu(scanner);
         }
     }
 
@@ -135,14 +133,15 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
         UserStory userstory = new UserStory(idUserStory,  this.idEpic, userstoryNaam, userstorybeschrijving);
         this.UserStories.add(userstory);
 
-        System.out.println("Userstory: " + userstoryNaam + " toegevoegd aan epic:" + scrumItemNaam + "!");
+        System.out.println("Userstory: " + userstoryNaam + " toegevoegd aan epic: " + scrumItemNaam + "!");
+        Main.Contextmenu(scanner);
     }
 
     public ArrayList<UserStory> getUserStories() {
         return UserStories;
     }
 
-    public void toonBerichten() {
+    public void toonBerichten(Scanner scanner) throws SQLException {
         List<Bericht> berichten = new ArrayList<>();
         try (Connection connection = DatabaseUtil.getConnection()) {
             String query = "SELECT * FROM Bericht_Epic WHERE Epic_has_gebruiker_Epic_idEpic = ?";
@@ -165,13 +164,25 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
             bericht.toString();
         }
 
+        System.out.println("-- Typ posten om een nieuw bericht aan te maken of typ terug om terug te gaan --");
+        String keuze = scanner.nextLine();
+
+        if (keuze.equalsIgnoreCase("posten")) {
+            BerichtAanmaken(scanner);
+        }
+        else if (keuze.equalsIgnoreCase("terug")) {
+            Main.Contextmenu(scanner);
+        }
+
+
     }
 
-    public void menu(Scanner scanner) {
+    public void menu(Scanner scanner) throws SQLException {
         while (true) {
             System.out.println("\nEpic Menu: " + scrumItemNaam);
             System.out.println("1. Navigeer naar een User Story");
-            System.out.println("2. Terug");
+            System.out.println("2. Toon berichten");
+            System.out.println("3. Terug");
             System.out.print("Kies een optie: ");
             int keuze;
 
@@ -187,8 +198,11 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
                     navigeerNaarUserStory(scanner);
                     break;
                 case 2:
+                    toonBerichten(scanner);
+                    break;
+                case 3:
                     Main.gaTerug();
-                    main.Contextmenu(scanner);
+                    Main.Contextmenu(scanner);
                     return;
                 default:
                     System.out.println("Ongeldige keuze. Probeer opnieuw.");
@@ -196,7 +210,7 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
         }
     }
 
-    private void navigeerNaarUserStory(Scanner scanner) {
+    private void navigeerNaarUserStory(Scanner scanner) throws SQLException {
         try(Connection connection = DatabaseUtil.getConnection()) {
             String query = "SELECT * FROM Userstory WHERE Epic_idEpic = ?";
             PreparedStatement statement = connection.prepareStatement(query);
@@ -227,7 +241,7 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
         String keuze = scanner.nextLine();
 
         if (keuze.equalsIgnoreCase("terug")) {
-            menu();
+            Main.Contextmenu(scanner);
             return;
         } else if (keuze.equalsIgnoreCase("verwijder")) {
 //        verwijder aan maken
@@ -254,6 +268,27 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
 
 
         System.out.println("User Story niet gevonden. Probeer opnieuw.");
+    }
+
+    private void VerwijderUserStory(Scanner scanner) throws SQLException {
+        System.out.println("Typ de naam van de userstory die je wilt verwijderen");
+        String usNaam = scanner.nextLine();
+        for (UserStory userStory : UserStories) {
+            if (userStory.getScrumItemNaam().equalsIgnoreCase(usNaam)) {
+                try (Connection connection = DatabaseUtil.getConnection()) {
+                    String query = "DELETE FROM Userstory WHERE idUserstory = ?";
+                    PreparedStatement statement = connection.prepareStatement(query);
+                    statement.setInt(1, userStory.getIdScrumItem());
+                    statement.executeUpdate();
+                }
+
+                UserStories.remove(userStory);
+                System.out.println("Userstory succesvol verwijderd");
+                Main.Contextmenu(scanner);
+            }
+        }
+        System.out.println("Userstory niet gevonden. Probeer opnieuw.");
+        Main.Contextmenu(scanner);
     }
 
 }
