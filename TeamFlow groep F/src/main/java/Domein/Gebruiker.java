@@ -12,6 +12,8 @@ public class Gebruiker {
     public Gebruiker (int idGebruiker, String gebruikersNaam) {
         this.idGebruiker = idGebruiker;
         this.gebruikersNaam = gebruikersNaam;
+        this.teams = new ArrayList<>();
+        this.scrumItems = new ArrayList<>();
     }
 
     public String getGebruikersNaam() {
