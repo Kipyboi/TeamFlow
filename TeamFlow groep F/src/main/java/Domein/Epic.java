@@ -8,10 +8,7 @@ import java.util.List;
 import java.sql.ResultSet;
 
 import javax.xml.crypto.Data;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -104,7 +101,7 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
     public void UserstoryAanmaken (Scanner scanner) throws SQLException {
         System.out.println("Typ hieronder de naam van de userstory die je wilt aanmaken (enter om te versturen): ");
         String userstoryNaam = scanner.nextLine();
-        System.out.println("Typ hieronder de beschrijving van " + userstoryNaam +" (enter om te versturen): ");
+        System.out.println("Typ hieronder de beschrijving van " + userstoryNaam + " (enter om te versturen): ");
         String userstorybeschrijving = scanner.nextLine();
 
         try (Connection connection = DatabaseUtil.getConnection()) {
@@ -117,24 +114,25 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
 
             statement.executeUpdate();
         }
+        int idUserStory = -1;
         try (Connection connection = DatabaseUtil.getConnection()) {
             String query = "SELECT idUserStory FROM Userstory WHERE UserStoryNaam = ?";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, userstoryNaam);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                this.idUserStory = resultSet.getInt("idUserStory");
+                idUserStory = resultSet.getInt("idUserStory");
             }
         }
         try (Connection connection = DatabaseUtil.getConnection()) {
             String query = "INSERT INTO gebruiker_has_Userstory (gebruiker_idGebruiker, Userstory_idUserstory) VALUES (?, ?)";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, Session.getActiveGebruiker().getIdGebruiker());
-            statement.setInt(2, this.idUserStory);
+            statement.setInt(2, idUserStory);
             statement.executeUpdate();
         }
 
-        UserStory userstory = new UserStory (userstoryNaam, userstorybeschrijving);
+        UserStory userstory = new UserStory(idUserStory,  this.idEpic, userstoryNaam, userstorybeschrijving);
         this.UserStories.add(userstory);
 
         System.out.println("Userstory: " + userstoryNaam + " toegevoegd aan epic:" + scrumItemNaam + "!");
