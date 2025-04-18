@@ -37,7 +37,7 @@ public class GebruikerService {
         System.out.println("Voer de gebruikersnaam van de nieuwe gebruiker in: ");
         String gebruikersNaam = scanner.nextLine();
         try (Connection connection = DatabaseUtil.getConnection()) {
-            String query = "INSERT INTO gebruiker VALUE (?)";
+            String query = "INSERT INTO gebruiker (gebruikersNaam) VALUES (?)";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, gebruikersNaam);
             statement.executeUpdate();
