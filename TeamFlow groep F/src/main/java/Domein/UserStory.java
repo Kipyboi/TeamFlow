@@ -3,9 +3,11 @@ package Domein;
 import Utils.DatabaseUtil;
 import Utils.GeselecteerdeEpicSession;
 import Utils.GeselecteerdeUserStorySession;
+import Utils.Session;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -75,24 +77,25 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
 
             statement.executeUpdate();
         }
+        int idTaken = -1;
         try (Connection connection = DatabaseUtil.getConnection()) {
             String query = "SELECT idTaken FROM taken WHERE TaakNaam = ?";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, taakNaam);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                this.idUserStory = resultSet.getInt("idTaken");
+                idTaken = resultSet.getInt("idTaken");
             }
         }
         try (Connection connection = DatabaseUtil.getConnection()) {
             String query = "INSERT INTO gebruiker_has_Taken (gebruiker_idGebruiker, Taken_idTaken) VALUES (?, ?)";
             PreparedStatement statement = connection.prepareStatement(query);
-            statement.setInt(1, session.getActiveGebruiker().getIdGebruiker());
-            statement.setInt(2, this.idUserStory);
+            statement.setInt(1, Session.getActiveGebruiker().getIdGebruiker());
+            statement.setInt(2, idTaken);
             statement.executeUpdate();
         }
 
-        Taken taak = new Taken(taakNaam, taakBeschrijving);
+        Taken taak = new Taken(this.idUserStory, idTaken, taakNaam, taakBeschrijving);
         this.taken.add(taak);
 
         System.out.println("Taak: " + taakNaam + " toegevoegd aan userstory:" + scrumItemNaam + "!");
@@ -104,7 +107,7 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
 
     public void toonBerichten() {
         try (Connection connection = DatabaseUtil.getConnection()) {
-            String query = "SELECT * FROM Bericht WHERE Userstory_idUserstory = ?";
+            String query = "SELECT * FROM Bericht_Userstory WHERE Userstory_idUserstory = ?";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, this.idUserStory);
             ResultSet resultSet = statement.executeQuery();

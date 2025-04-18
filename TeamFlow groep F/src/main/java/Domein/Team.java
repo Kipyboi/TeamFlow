@@ -108,7 +108,7 @@ public class Team implements IZoek, IMenu {
     public void EpicAanmaken (Scanner scanner) throws SQLException {
         System.out.println("Typ hieronder de naam van de epic die je wilt aanmaken (enter om te versturen): ");
         String epicNaam = scanner.nextLine();
-        System.out.println("Typ hieronder de beschrijving van " + epicNaam +" (enter om te versturen): ");
+        System.out.println("Typ hieronder de beschrijving van " + epicNaam + " (enter om te versturen): ");
         String epicbeschrijving = scanner.nextLine();
 
         try (Connection connection = DatabaseUtil.getConnection()) {
@@ -121,6 +121,7 @@ public class Team implements IZoek, IMenu {
 
             statement.executeUpdate();
         }
+        int idEpic = -1;
         try (Connection connection = DatabaseUtil.getConnection()) {
             String query = "SELECT idEpic FROM Epic WHERE EpicNaam = ? AND team_idteam = ?";
             PreparedStatement statement = connection.prepareStatement(query);
@@ -128,24 +129,24 @@ public class Team implements IZoek, IMenu {
             statement.setInt(2, this.idTeam);
             ResultSet resultSet = statement.executeQuery();
             if (resultSet.next()) {
-                this.idEpic = resultSet.getInt("idEpic");
+                idEpic = resultSet.getInt("idEpic");
             }
         }
         try (Connection connection = DatabaseUtil.getConnection()) {
             String query = "INSERT INTO Epic_has_gebruiker (gebruiker_idGebruiker, Epic_idEpic) VALUES (?, ?)";
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1, Session.getActiveGebruiker().getIdGebruiker());
-            statement.setInt(2, this.idEpic);
+            statement.setInt(2, idEpic);
             statement.executeUpdate();
         }
 
 
         // later op terug komen
         // waarom heeft epic geen beschijving en naam het heeft aleen een naam, maar in database heeft het beide???
-        Epic epic = new Epic(epicNaam, epicbeschrijving);
+        Epic epic = new Epic(idEpic, epicNaam, epicbeschrijving);
         this.epics.add(epic);
 
-        System.out.println("Epic: "+ epicNaam +" toegevoegd!");
+        System.out.println("Epic: " + epicNaam + " toegevoegd!");
     }
 
     public void gaNaar (Scanner scanner) {
