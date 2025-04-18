@@ -6,6 +6,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Stack;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import Utils.DatabaseUtil;
+import java.sql.ResultSet;
+
+
 
 public class Main {
     public static Stack<Object> navigationStack = new Stack<>();
@@ -85,11 +92,15 @@ public class Main {
             System.out.println("- " + team.getName());
         }
 
-        System.out.println("Typ de naam van het team dat u wilt bekijken of typ 'terug' om terug te gaan:");
+        System.out.println("Typ de naam van het team dat u wilt bekijken of typ 'terug' om terug te gaan of typ 'aanmaak' om een team aan temaken:");
         String keuze = scanner.nextLine();
 
         if (keuze.equalsIgnoreCase("terug")) {
             toonHoofdMenu(scanner);
+            return;
+        }
+        if (keuze.equalsIgnoreCase("aanmaak")) {
+            maakTeamAan(scanner);
             return;
         }
 
@@ -107,5 +118,48 @@ public class Main {
         if (!navigationStack.isEmpty()) {
             navigationStack.pop();
         }
+    }
+    public static void maakTeamAan(Scanner scanner) throws SQLException {
+        int idTeam = -1;
+        System.out.println("Voer de naam van het nieuwe team in: ");
+        String teamNaam = scanner.nextLine();
+        System.out.println("geef een beschrijving van het team: ");
+        String teamBeschrijving = scanner.nextLine();
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "INSERT INTO team (teamNaam, teamBeschrijving) VALUES (?, ?)";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, teamNaam);
+            statement.setString(2, teamBeschrijving);
+            statement.executeUpdate();
+            System.out.println("Team aangemaakt!");
+        } catch (SQLException e) {
+            System.out.println("Fout bij het aanmaken van het team: " + e.getMessage());
+        }
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "SELECT idTeam FROM team WHERE teamNaam = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, teamNaam);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                idTeam = resultSet.getInt("idTeam");
+            } else {
+                System.out.println("Team niet gevonden na aanmaken.");
+            }
+        } catch (SQLException e) {
+            System.out.println("Fout bij het ophalen van het aangemaakte team: " + e.getMessage());
+        }
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "INSERT INTO gebruiker_has_team (gebruiker_idGebruiker, team_idteam) VALUES (?, ?)";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, Session.getActiveGebruiker().getIdGebruiker());
+            statement.setInt(2, idTeam);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Fout bij het toevoegen van aangemaakte team " + e.getMessage());
+        } finally {
+            toonTeams(scanner);
+        }
+
+
     }
 }
