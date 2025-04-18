@@ -155,6 +155,23 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
     }
 
     private void navigeerNaarTaak(Scanner scanner) {
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "SELECT * FROM taken WHERE Userstory_idUserstory = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, this.idUserStory);
+            ResultSet resultSet = statement.executeQuery();
+
+            taken = new ArrayList<>();
+            while (resultSet.next()) {
+                int idTaken = resultSet.getInt("idTaken");
+                String taakNaam = resultSet.getString("TaakNaam");
+                String taakBeschrijving = resultSet.getString("TaakBeschrijving");
+                Taken taak = new Taken(this.idUserStory, idTaken, taakNaam, taakBeschrijving);
+                taken.add(taak);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         if (taken.isEmpty()) {
             System.out.println("Er zijn geen taken gekoppeld aan deze user story.");
             return;
@@ -165,19 +182,31 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
             System.out.println("- " + taak.getScrumItemNaam());
         }
 
-        System.out.println("Typ de naam van de Taak die u wilt bekijken of typ 'terug' om terug te gaan:");
+        System.out.println("Typ de naam van de Taak die u wilt bekijken typ 'terug' om terug tegaan typ 'verwijder' om een taak te verwijderen of typ 'aanmaken' om een taak aan te maken:");
         String keuze = scanner.nextLine();
 
         if (keuze.equalsIgnoreCase("terug")) {
+            menu(scanner);
             return;
-        }
-
-        for (Taken taak : taken) {
-            if (taak.getScrumItemNaam().equalsIgnoreCase(keuze)) {
-                Main.navigationStack.push(taak);
-                return;
+        } else if (keuze.equalsIgnoreCase('verwijder')) {
+//            taak verwijderen
+            TaakVerwijderen(scanner);
+            return;
+        } else if (keuze.equalsIgnoreCase('aanmaken')) {
+//            taak aanmaken
+            TaakAanmaken(scanner);
+            return;
+        }else {
+            for (Taken taak : taken) {
+                if (taak.getScrumItemNaam().equalsIgnoreCase(keuze)) {
+                    Main.navigationStack.push(taak);
+                    Main.Contextmenu(scanner);
+                    return;
+                }
             }
         }
+
+
 
         System.out.println("Taak niet gevonden. Probeer opnieuw.");
     }

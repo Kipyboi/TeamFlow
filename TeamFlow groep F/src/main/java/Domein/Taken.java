@@ -51,6 +51,7 @@ public class Taken extends ScrumItem{
             switch (keuze) {
                 case 1:
                     Main.gaTerug();
+                    Main.Contextmenu(scanner);
                     return;
                 default:
                     System.out.println("Ongeldige keuze. Probeer opnieuw.");

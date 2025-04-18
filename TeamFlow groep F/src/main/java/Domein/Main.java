@@ -32,6 +32,10 @@ public class Main {
             gebruikersnaam = scanner.nextLine();
         }
         System.out.println("Succesvol ingelogd!");
+        Contextmenu(scanner);
+    }
+
+    public static void Contextmenu(Scanner scanner)throws SQLException {
         while (true) {
             if (navigationStack.isEmpty()) {
                 toonHoofdMenu(scanner);
@@ -105,12 +109,12 @@ public class Main {
         }
 
 
-        System.out.println("Beschikbare teams:");
+        System.out.println("-- Beschikbare teams: --");
         for (Team team : teams) {
             System.out.println("- " + team.getName());
         }
 
-        System.out.println("Typ de naam van het team dat u wilt bekijken of typ 'terug' om terug te gaan of typ 'aanmaken' om een team aan temaken:");
+        System.out.println("Typ de naam van het team dat u wilt bekijken typ 'terug' om terug te gaan of typ 'aanmaken' om een team aan temaken:");
         String keuze = scanner.nextLine();
 
         if (keuze.equalsIgnoreCase("terug")) {
@@ -125,6 +129,7 @@ public class Main {
         for (Team team : teams) {
             if (team.getName().equalsIgnoreCase(keuze)) {
                 navigationStack.push(team);
+                Contextmenu(scanner);
                 return;
             }
         }

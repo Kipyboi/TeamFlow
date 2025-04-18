@@ -188,6 +188,7 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
                     break;
                 case 2:
                     Main.gaTerug();
+                    main.Contextmenu(scanner);
                     return;
                 default:
                     System.out.println("Ongeldige keuze. Probeer opnieuw.");
@@ -196,6 +197,22 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
     }
 
     private void navigeerNaarUserStory(Scanner scanner) {
+        try(Connection connection = DatabaseUtil.getConnection()) {
+            String query = "SELECT * FROM Userstory WHERE Epic_idEpic = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, this.idEpic);
+            ResultSet resultSet = statement.executeQuery();
+
+            UserStories = new ArrayList<>();
+            while (resultSet.next()) {
+                int idUserStory = resultSet.getInt("idUserStory");
+                String naam = resultSet.getString("UserStoryNaam");
+                String beschrijving = resultSet.getString("UserStoryBeschrijving");
+                UserStories.add(new UserStory(idUserStory, this.idEpic, naam, beschrijving));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         if (UserStories.isEmpty()) {
             System.out.println("Er zijn geen user stories gekoppeld aan deze epic.");
             return;
@@ -206,19 +223,35 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
             System.out.println("- " + userStory.getScrumItemNaam());
         }
 
-        System.out.println("Typ de naam van de User Story die u wilt bekijken of typ 'terug' om terug te gaan:");
+        System.out.println("Typ 'verwijder' om een Userstory te verwijderen type 'aanmaken' om een userstory aan temaken typ 'terug' om terug tegaan of typ de naam van een userstory om naar de userstory tegaan:");
         String keuze = scanner.nextLine();
 
         if (keuze.equalsIgnoreCase("terug")) {
+            menu();
             return;
-        }
+        } else if (keuze.equalsIgnoreCase("verwijder")) {
+//        verwijder aan maken
+            VerwijderUserStory(scanner);
+            navigeerNaarUserStory(scanner);
 
-        for (UserStory userStory : UserStories) {
-            if (userStory.getScrumItemNaam().equalsIgnoreCase(keuze)) {
-                Main.navigationStack.push(userStory);
-                return;
+        }else if (keuze.equalsIgnoreCase("aanmaken")) {
+                // Userstory aanmaken
+            UserstoryAanmaken(scanner);
+            navigeerNaarUserStory(scanner);
+            return;
+        }else {
+            for (UserStory userStory : UserStories) {
+                if (userStory.getScrumItemNaam().equalsIgnoreCase(keuze)) {
+                    Main.navigationStack.push(userStory);
+                    Main.Contextmenu(scanner);
+                    return;
+                } else {
+                    System.out.println("User Story niet gevonden. Probeer opnieuw.");
+                }
             }
         }
+
+
 
         System.out.println("User Story niet gevonden. Probeer opnieuw.");
     }
