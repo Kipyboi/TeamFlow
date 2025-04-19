@@ -171,7 +171,7 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
             System.out.println("1. Navigeer naar een Taak");
             System.out.println("2. Toon berichten");
             System.out.println("3. Gebruiker toewijzen aan userstory");
-            System.out.println("3. Terug");
+            System.out.println("4. Terug");
             System.out.print("Kies een optie: ");
             int keuze;
 
@@ -265,13 +265,13 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
                 try (Connection connection = DatabaseUtil.getConnection()) {
                     String query = "DELETE FROM Taken WHERE idTaken = ?";
                     PreparedStatement statement = connection.prepareStatement(query);
-                    statement.setInt(1, taak.getIdScrumItem());
+                    statement.setInt(1, taak.getIdTaken());
                     statement.executeUpdate();
                 }
 
-                // ik hoop dat dit wel werkt
+                
                 taken.removeIf(e -> e.getScrumItemNaam().equals(usNaam));
-//                taken.remove(taak);
+                taken.remove(taak);
                 System.out.println("Taak succesvol verwijderd");
                 Main.Contextmenu(scanner);
             }
@@ -383,6 +383,10 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
             Main.Contextmenu(scanner);
         }
     }
+
+    public int getIdUserStory() {
+        return idUserStory;
     }
+}
 
 

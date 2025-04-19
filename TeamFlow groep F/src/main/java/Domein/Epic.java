@@ -331,7 +331,7 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
                 try (Connection connection = DatabaseUtil.getConnection()) {
                     String query = "DELETE FROM Userstory WHERE idUserstory = ?";
                     PreparedStatement statement = connection.prepareStatement(query);
-                    statement.setInt(1, userStory.getIdScrumItem());
+                    statement.setInt(1, userStory.getIdUserStory());
                     statement.executeUpdate();
                 }
 
@@ -378,4 +378,7 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
     }
 
 
+    public int getIdEpic() {
+        return idEpic;
+    }
 }
