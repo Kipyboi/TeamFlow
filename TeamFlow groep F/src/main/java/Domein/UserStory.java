@@ -233,7 +233,9 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
                     statement.executeUpdate();
                 }
 
-                taken.remove(taak);
+                // ik hoop dat dit wel werkt
+                taken.removeIf(e -> e.getScrumItemNaam().equals(usNaam));
+//                taken.remove(taak);
                 System.out.println("Taak succesvol verwijderd");
                 Main.Contextmenu(scanner);
             }
