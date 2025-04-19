@@ -54,8 +54,7 @@ public class Main {
         System.out.println("Kies een optie:");
         System.out.println("1. Naar teams");
         System.out.println("2. Nieuwe gebruiker aanmaken");
-        System.out.println("3. Nieuwe gebruiker aanmaken");
-        System.out.println("4. Afsluiten");
+        System.out.println("3. Afsluiten");
         while (true) {
             int keuze = scanner.nextInt();
             scanner.nextLine(); // Consume newline
@@ -69,10 +68,6 @@ public class Main {
                     aanmaakService.gebruikerAanmaken(scanner);
                     break;
                 case 3:
-                    Gebruiker actieveGebruiker = Session.getActiveGebruiker();
-                    actieveGebruiker.AlleTeamsPrinten(scanner);
-                    break;
-                case 4:
                     System.out.println("Programma afgesloten.");
                     System.exit(0);
                     break;
