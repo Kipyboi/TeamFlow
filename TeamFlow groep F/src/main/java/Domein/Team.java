@@ -16,12 +16,21 @@ public class Team implements IZoek, IMenu {
     private String teamNaam;
     private ArrayList<GebruikerHasTeam> gebruikers;
     private ArrayList<Epic> epics;
+    private ArrayList<Taken> taak;
+    private ArrayList<UserStory> userStory;
 
     public Team (int idTeam, String TeamNaam) {
         this.idTeam = idTeam;
         this.teamNaam = TeamNaam;
         gebruikers = new ArrayList<>();
         epics = new ArrayList<>();
+        taak = new ArrayList<>();
+        userStory = new ArrayList<>();
+    }
+    public List<UserStory> getUserStory() {
+    }
+
+    public List<Taken> getTaken() {
     }
 
     public String getTeamNaam() {

@@ -22,6 +22,40 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
         this.Epic_idEpic = Epic_IdEpic;
     }
 
+    public void zoek (Scanner scanner) throws SQLException {
+        System.out.println("Typ hieronder de naam in van de userstory die u zoekt");
+        String zoekterm = scanner.nextLine();
+        Team geselecteerdTeam = GeselecteerdTeamSession.getGeselecteerdTeam();
+        boolean gevonden = false;
+
+        for (UserStory userStory : geselecteerdTeam.getUserStory()) {
+            if (userStory.getScrumItemNaam().toLowerCase().contains(zoekterm.toLowerCase())) {
+                System.out.println("UserStory: " + userStory.getScrumItemNaam());
+                System.out.println();
+                gevonden = true;
+            }
+        }
+        if(!gevonden) {
+            System.out.println("UserStory is niet gevonden.");
+            return;
+        }
+        System.out.println("Typ de naam van de userStory die u wilt bekijken.");
+        String userStoryNaam = scanner.nextLine();
+        boolean userStoryGevonden = false;
+
+
+        for (UserStory userStory : geselecteerdTeam.getUserStory()) {
+            if (userStory.getScrumItemNaam().equalsIgnoreCase(userStoryNaam)) {
+                userStory.menu(scanner);
+                userStoryGevonden = true;
+                break;
+            }
+        }
+        if (!userStoryGevonden) {
+            System.out.println("Geen geldige userStory met deze naam gevonden");
+        }
+    }
+
 
 //    @Override
 //    public void zoek(Scanner scanner) {

@@ -19,6 +19,39 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
         super(scrumItemNaam, beschrijving);
         this.idEpic = idEpic;
     }
+    public void zoek (Scanner scanner) throws SQLException {
+        System.out.println("Typ hieronder de naam in van de epic die u zoekt");
+        String zoekterm = scanner.nextLine();
+        Team geselecteerdTeam = GeselecteerdTeamSession.getGeselecteerdTeam();
+        boolean gevonden = false;
+
+        for (Taken epic : geselecteerdTeam.getTaken()) {
+            if (epic.getScrumItemNaam().toLowerCase().contains(zoekterm.toLowerCase())) {
+                System.out.println("Epic:" + epic.getScrumItemNaam());
+                System.out.println();
+                gevonden = true;
+            }
+        }
+        if(!gevonden) {
+            System.out.println("Epic is niet gevonden.");
+            return;
+        }
+        System.out.println("Typ de naam van de epic die u wilt bekijken.");
+        String epicNaam = scanner.nextLine();
+        boolean epicGevonden = false;
+
+
+        for (Taken epic : geselecteerdTeam.getTaken()) {
+            if (epic.getScrumItemNaam().equalsIgnoreCase(epicNaam)) {
+                epic.menu(scanner);
+                epicGevonden = true;
+                break;
+            }
+        }
+        if (!epicGevonden) {
+            System.out.println("Geen geldige epic met deze naam gevonden");
+        }
+    }
 
     @Override
     protected ArrayList<GebruikerHasScrumItem> checkToegewezen() throws SQLException{
