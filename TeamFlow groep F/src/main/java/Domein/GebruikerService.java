@@ -46,10 +46,11 @@ public class GebruikerService {
         toonHoofdMenu(scanner);
     }
 
-    public boolean gebruikerInloggen (String gebruikersNaam) {
+    public boolean gebruikerInloggen (String gebruikersNaam) throws SQLException {
         for (Gebruiker gebruiker : gebruikers) {
             if (gebruiker.getGebruikersNaam().equals(gebruikersNaam)) {
                 Session.setActieveGebruiker(gebruiker);
+                Session.getActiveGebruiker().fillScrumItems();
                 return true;
             }
         }

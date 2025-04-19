@@ -13,16 +13,46 @@ public class Taken extends ScrumItem implements IMenu{
     private int UserStory_idUserStory;
     private int idTaken;
 
-    public Taken (int UserStory_idUserStory, int IdTaken, String scrumItemNaam, String beschrijving) {
+    public Taken (int UserStory_idUserStory, int IdTaken, String scrumItemNaam, String beschrijving) throws SQLException {
         super(scrumItemNaam, beschrijving);
         this.UserStory_idUserStory = UserStory_idUserStory;
         this.idTaken = IdTaken;
     }
-    public Taken (String scrumItemNaam, String beschrijving ){
-        super(scrumItemNaam, beschrijving);
+
+
+    @Override
+    protected ArrayList<GebruikerHasScrumItem> checkToegewezen() throws SQLException {
+        gebruikers = new ArrayList<>();
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "SELECT * FROM gebruiker_has_Taken WHERE gebruiker_idGebruiker = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, Session.getActiveGebruiker().getIdGebruiker());
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                GebruikerHasScrumItem ghsi = new GebruikerHasScrumItem(Session.getActiveGebruiker(), this);
+                gebruikers.add(ghsi);
+            }
+        }
+        return gebruikers;
     }
 
-    public void gebruikerToewijzen (Gebruiker gebruiker) throws SQLException {
+    public void gebruikerToewijzen (Scanner scanner) throws SQLException {
+        Gebruiker gebruiker = null;
+        System.out.println("Typ de naam in van de gebruiker die je wilt toewijzen: ");
+        String naam = scanner.nextLine();
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "SELECT * FROM gebruiker WHERE GebruikersNaam = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, naam);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                gebruiker = new Gebruiker(resultSet.getInt("idGebruiker"), resultSet.getString("GebruikersNaam"));
+            }
+            else {
+                System.out.println("Gebruiker niet gevonden.");
+                Main.Contextmenu(scanner);
+            }
+        }
         GebruikerHasScrumItem ghsi = new GebruikerHasScrumItem(gebruiker, this);
         gebruiker.addScrumItem(ghsi);
         gebruikers.add(ghsi);
@@ -38,8 +68,9 @@ public class Taken extends ScrumItem implements IMenu{
 
     public void menu(Scanner scanner) throws SQLException {
         while (true) {
-            System.out.println("\nTaak Menu: " + scrumItemNaam);
+            System.out.println("\nTaak Menu: " + scrumItemNaam + ": " + beschrijving);
             System.out.println("1. Toon berichten");
+            System.out.println("2. Gebruiker toewijzen aan taak");
             System.out.println("2. Terug");
             System.out.print("Kies een optie: ");
             int keuze;
@@ -56,6 +87,8 @@ public class Taken extends ScrumItem implements IMenu{
                     toonBerichten(scanner);
                     break;
                 case 2:
+                    gebruikerToewijzen(scanner);
+                case 3:
                     Main.gaTerug();
                     Main.Contextmenu(scanner);
                     return;
@@ -100,8 +133,11 @@ public class Taken extends ScrumItem implements IMenu{
     public void BerichtAanmaken (Scanner scanner) throws SQLException {
         boolean toegewezen = false;
         for (GebruikerHasScrumItem ghsi : Session.getActiveGebruiker().getScrumItems()) {
-            if (ghsi.getScrumItem().getGebruikers().contains(Session.getActiveGebruiker())) {
-                toegewezen = true;
+            ArrayList<GebruikerHasScrumItem> temp = ghsi.getScrumItem().gebruikers;
+            for (GebruikerHasScrumItem ghsi2 : temp) {
+                if(ghsi2.getGebruiker() == Session.getActiveGebruiker()){
+                    toegewezen = true;
+                }
             }
         }
 

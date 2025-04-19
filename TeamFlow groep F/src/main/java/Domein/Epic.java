@@ -15,13 +15,29 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
     private int idEpic;
     ArrayList<UserStory> UserStories;
 
-    public Epic (int idEpic, String scrumItemNaam, String beschrijving) {
+    public Epic (int idEpic, String scrumItemNaam, String beschrijving) throws SQLException {
         super(scrumItemNaam, beschrijving);
         this.idEpic = idEpic;
     }
-    public Epic (String scrumItemNaam, String beschrijving) {
-        super(scrumItemNaam, beschrijving);
+
+    @Override
+    protected ArrayList<GebruikerHasScrumItem> checkToegewezen() throws SQLException{
+        gebruikers = new ArrayList<>();
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "SELECT * FROM Epic_has_gebruiker WHERE gebruiker_idGebruiker = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, Session.getActiveGebruiker().getIdGebruiker());
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                GebruikerHasScrumItem ghsi = new GebruikerHasScrumItem(Session.getActiveGebruiker(), this);
+                gebruikers.add(ghsi);
+            }
+        }
+        return gebruikers;
     }
+
+
+
 
 //    @Override
 //    public void zoek(Scanner scanner) {
@@ -58,7 +74,23 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
 //
 //        System.out.println("User story met de naam '" + usNaam + "' niet gevonden.");
 //    }
-    public void gebruikerToewijzen (Gebruiker gebruiker) throws SQLException {
+    public void gebruikerToewijzen (Scanner scanner) throws SQLException {
+        Gebruiker gebruiker = null;
+        System.out.println("Typ de naam in van de gebruiker die je wilt toewijzen: ");
+        String naam = scanner.nextLine();
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "SELECT * FROM gebruiker WHERE GebruikersNaam = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, naam);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                gebruiker = new Gebruiker(resultSet.getInt("idGebruiker"), resultSet.getString("GebruikersNaam"));
+            }
+            else {
+                System.out.println("Gebruiker niet gevonden.");
+                Main.Contextmenu(scanner);
+            }
+        }
         GebruikerHasScrumItem ghsi = new GebruikerHasScrumItem(gebruiker, this);
         gebruiker.addScrumItem(ghsi);
         gebruikers.add(ghsi);
@@ -69,14 +101,18 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
             statement.setInt(2, this.idEpic);
             statement.executeUpdate();
         }
-        System.out.println("De Epic is succesvol aan u toegewezen.");
+        System.out.println("De Epic is succesvol toegewezen aan: " + naam);
+        Main.Contextmenu(scanner);
     }
     @Override
     public void BerichtAanmaken (Scanner scanner) throws SQLException {
         boolean toegewezen = false;
         for (GebruikerHasScrumItem ghsi : Session.getActiveGebruiker().getScrumItems()) {
-            if (ghsi.getScrumItem().getGebruikers().contains(Session.getActiveGebruiker())) {
-                toegewezen = true;
+            ArrayList<GebruikerHasScrumItem> temp = ghsi.getScrumItem().gebruikers;
+            for (GebruikerHasScrumItem ghsi2 : temp) {
+                if(ghsi2.getGebruiker() == Session.getActiveGebruiker()){
+                    toegewezen = true;
+                }
             }
         }
 
@@ -176,7 +212,7 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
         }
 
         for (Bericht bericht : berichten) {
-            bericht.toString();
+            System.out.println(bericht.toString());
         }
 
         System.out.println("-- Typ posten om een nieuw bericht aan te maken of typ terug om terug te gaan --");
@@ -194,10 +230,11 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
 
     public void menu(Scanner scanner) throws SQLException {
         while (true) {
-            System.out.println("\nEpic Menu: " + scrumItemNaam);
+            System.out.println("\nEpic Menu: " + scrumItemNaam + ": " + beschrijving);
             System.out.println("1. Navigeer naar een User Story");
             System.out.println("2. Toon berichten");
-            System.out.println("3. Terug");
+            System.out.println("3. Gebruiker toewijzen aan epic");
+            System.out.println("4. Terug");
             System.out.print("Kies een optie: ");
             int keuze;
 
@@ -216,6 +253,8 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
                     toonBerichten(scanner);
                     break;
                 case 3:
+                    gebruikerToewijzen(scanner);
+                case 4:
                     Main.gaTerug();
                     Main.Contextmenu(scanner);
                     return;
