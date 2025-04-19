@@ -11,6 +11,8 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import static Domein.Main.navigationStack;
+
 public class UserStory extends ScrumItem  implements IZoek, IMenu {
     private int idUserStory;
     private int Epic_idEpic;
@@ -21,62 +23,41 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
         this.idUserStory = idUserStory;
         this.Epic_idEpic = Epic_IdEpic;
     }
-
+    @Override
     public void zoek (Scanner scanner) throws SQLException {
-        System.out.println("Typ hieronder de naam in van de userstory die u zoekt");
+        System.out.println("Typ hieronder de naam in van de taak die u zoekt");
         String zoekterm = scanner.nextLine();
-        Team geselecteerdTeam = GeselecteerdTeamSession.getGeselecteerdTeam();
         boolean gevonden = false;
 
-        for (UserStory userStory : geselecteerdTeam.getUserStory()) {
-            if (userStory.getScrumItemNaam().toLowerCase().contains(zoekterm.toLowerCase())) {
-                System.out.println("UserStory: " + userStory.getScrumItemNaam());
+        for (Taken taak : taken) {
+            if (taak.getScrumItemNaam().toLowerCase().contains(zoekterm.toLowerCase())) {
+                System.out.println("taak: " + taak.getScrumItemNaam());
                 System.out.println();
                 gevonden = true;
             }
         }
         if(!gevonden) {
-            System.out.println("UserStory is niet gevonden.");
+            System.out.println("Taak is niet gevonden.");
             return;
         }
-        System.out.println("Typ de naam van de userStory die u wilt bekijken.");
+        System.out.println("Typ de naam van de taak die u wilt bekijken.");
         String userStoryNaam = scanner.nextLine();
         boolean userStoryGevonden = false;
 
 
-        for (UserStory userStory : geselecteerdTeam.getUserStory()) {
-            if (userStory.getScrumItemNaam().equalsIgnoreCase(userStoryNaam)) {
-                userStory.menu(scanner);
+        for (Taken taak: taken) {
+            if (taak.getScrumItemNaam().equalsIgnoreCase(userStoryNaam)) {
+                navigationStack.push(taak);
+                Main.Contextmenu(scanner);
                 userStoryGevonden = true;
                 break;
             }
         }
         if (!userStoryGevonden) {
-            System.out.println("Geen geldige userStory met deze naam gevonden");
+            System.out.println("Geen taak met deze naam gevonden");
+            Main.Contextmenu(scanner);
         }
     }
-
-
-//    @Override
-//    public void zoek(Scanner scanner) {
-//        System.out.println("Typ hieronder de naam in van de taak die u zoekt");
-//        String zoekterm = scanner.nextLine();
-//        UserStory geselecteerdeUserStory = GeselecteerdeUserStorySession.getGeselecteerdeUserStory();
-//        for (Taken t : geselecteerdeUserStory.getTaken()) {
-//            if (t.getScrumItemNaam().toLowerCase().contains(zoekterm.toLowerCase())) {
-//                System.out.println(t.getScrumItemNaam());
-//                System.out.println();
-//            }
-//        }
-//        System.out.println("Typ de naam van de epic die u wilt bekijken.");
-//        String usNaam = scanner.nextLine();
-//        for (Taken t : geselecteerdeUserStory.getTaken()) {
-//            if (t.getScrumItemNaam().equalsIgnoreCase(usNaam)) {
-//                t.gaNaar(scanner);
-//            }
-//        }
-//
-//    }
 
 
     @Override
@@ -198,7 +179,7 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
         }
     }
 
-
+    @Override
     public void menu(Scanner scanner) throws SQLException {
         while (true) {
             System.out.println("\nUser Story Menu: " + scrumItemNaam + ": " + beschrijving);
@@ -263,6 +244,7 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
         }
 
         System.out.println("Typ de naam van de Taak die u wilt bekijken typ 'terug' om terug tegaan typ 'verwijder' om een taak te verwijderen of typ 'aanmaken' om een taak aan te maken:");
+        System.out.println("of typ zoek om een taak te zoeken");
         String keuze = scanner.nextLine();
 
         if (keuze.equalsIgnoreCase("terug")) {
@@ -276,10 +258,15 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
 //            taak aanmaken
             TaakAanmaken(scanner);
             return;
-        }else {
+        }
+        else if (keuze.equalsIgnoreCase("zoek")) {
+            zoek(scanner);
+            return;
+        }
+        else {
             for (Taken taak : taken) {
                 if (taak.getScrumItemNaam().equalsIgnoreCase(keuze)) {
-                    Main.navigationStack.push(taak);
+                    navigationStack.push(taak);
                     Main.Contextmenu(scanner);
                     return;
                 }
@@ -312,67 +299,6 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
         }
         System.out.println("Taak niet gevonden. Probeer opnieuw.");
         Main.Contextmenu(scanner);
-    }
-
-    public void toonTaken(Scanner scanner) {
-        ArrayList<Taken> taken = this.getTaken();
-
-        if (taken == null || taken.isEmpty()) {
-            System.out.println("Deze User Story heeft nog geen taken.");
-            return;
-        }
-        while (true) {
-            System.out.println("Taken voor deze User Story:");
-            int num = 1;
-            for (Taken taak : taken) {
-                System.out.println("Status: " + taak.getStatus());
-                System.out.println(num + ". " + taak.getScrumItemNaam());
-                System.out.println("   - " + taak.beschrijving);
-                System.out.println();
-                num++;
-            }
-
-            System.out.print("Wil je de status van de taak veranderen? (ja/nee): ");
-            String antwoord = scanner.nextLine();
-
-            if (antwoord.equalsIgnoreCase("ja")) {
-                System.out.print("Typ het nummer van de taak waarvan je de status wilt veranderen: ");
-                try {
-                    int keuze = Integer.parseInt(scanner.nextLine());
-                    if (keuze < 1 || keuze > taken.size()) {
-                        System.out.println("Ongeldige keuze.");
-                        return;
-                    }
-
-                    Taken gekozenTaak = taken.get(keuze - 1);
-                    System.out.println("Huidige status van " + gekozenTaak.getScrumItemNaam() + ": " + gekozenTaak.getStatus());
-                    System.out.println("Wat wordt de nieuwe status?");
-                    System.out.println("0 = Open, 1 = Bezig, 2 = Klaar");
-
-                    int nieuweStatus = Integer.parseInt(scanner.nextLine());
-                    if (nieuweStatus < 0 || nieuweStatus > 2) {
-                        System.out.println("Ongeldige status. Kies 0, 1 of 2.");
-                        return;
-                    }
-
-                    gekozenTaak.setStatus(nieuweStatus);
-                    System.out.println("Status succesvol aangepast naar: " + gekozenTaak.getStatus());
-
-                } catch (NumberFormatException e) {
-                    System.out.println("Ongeldige invoer. Gebruik een getal.");
-                }
-            } else {
-                System.out.println("Terug naar het menu.");
-                return;
-            }
-            System.out.println("Wil je nog een status aanpassen? (ja/nee)");
-            String nogEen = scanner.nextLine();
-            if (nogEen.equals("nee")) {
-                break;
-            }
-        }
-        System.out.println("Je gaat nu terug naar het menu");
-        return;
     }
 
 

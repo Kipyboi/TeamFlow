@@ -17,10 +17,6 @@ public class GebruikerHasScrumItem {
         return scrumItem;
     }
 
-    public void setScrumItem(ScrumItem scrumItem) {
-        this.scrumItem = scrumItem;
-    }
-
     public Gebruiker getGebruiker() {
         return gebruiker;
     }

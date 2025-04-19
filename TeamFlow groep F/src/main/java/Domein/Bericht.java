@@ -21,16 +21,6 @@ public class Bericht {
         this.idGebruiker = idGebruiker;
         this.gekoppeldItem = gekoppeldItem;
     }
-    public Bericht(int idBericht, Date tijdStamp, String bericht, int idGebruiker) {
-        this(idBericht, tijdStamp, bericht, idGebruiker, null);
-    }
-
-    public ScrumItem getGekoppeldItem() {
-        return gekoppeldItem;
-    }
-    public void setGekoppeldItem(ScrumItem gekoppeldItem) {
-        this.gekoppeldItem = gekoppeldItem;
-    }
 
     @Override
     public String toString() {

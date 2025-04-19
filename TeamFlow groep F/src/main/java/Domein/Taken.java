@@ -12,48 +12,12 @@ import java.util.Scanner;
 public class Taken extends ScrumItem implements IMenu {
     private int UserStory_idUserStory;
     private int idTaken;
-    private int status;
 
     public Taken (int UserStory_idUserStory, int IdTaken, String scrumItemNaam, String beschrijving) throws SQLException {
         super(scrumItemNaam, beschrijving);
         this.UserStory_idUserStory = UserStory_idUserStory;
         this.idTaken = IdTaken;
     }
-
-    public void zoek (Scanner scanner) throws SQLException {
-    System.out.println("Typ hieronder de naam in van de taak die u zoekt");
-    String zoekterm = scanner.nextLine();
-        Team geselecteerdTeam = GeselecteerdTeamSession.getGeselecteerdTeam();
-        boolean gevonden = false;
-
-        for (Taken taak : geselecteerdTeam.getTaken()) {
-            if (taak.getScrumItemNaam().toLowerCase().contains(zoekterm.toLowerCase())) {
-               System.out.println("Taak:" + taak.getScrumItemNaam());
-               System.out.println();
-               gevonden = true;
-            }
-        }
-        if(!gevonden) {
-            System.out.println("Taak is niet gevonden.");
-            return;
-        }
-       System.out.println("Typ de naam van de taak die u wilt bekijken.");
-        String taakNaam = scanner.nextLine();
-        boolean taakGevonden = false;
-
-
-        for (Taken taak : geselecteerdTeam.getTaken()) {
-            if (taak.getScrumItemNaam().equalsIgnoreCase(taakNaam)) {
-                taak.menu(scanner);
-                taakGevonden = true;
-                break;
-            }
-        }
-        if (!taakGevonden) {
-            System.out.println("Geen geldige taak met deze naam gevonden");
-        }
-    }
-
 
     @Override
     protected ArrayList<GebruikerHasScrumItem> checkToegewezen() throws SQLException {
@@ -102,7 +66,7 @@ public class Taken extends ScrumItem implements IMenu {
             }
             System.out.println("De taak is succesvol aan u toegewezen.");
         }
-
+        @Override
         public void menu (Scanner scanner) throws SQLException {
             while (true) {
                 System.out.println("\nTaak Menu: " + scrumItemNaam + ": " + beschrijving);
@@ -206,14 +170,6 @@ public class Taken extends ScrumItem implements IMenu {
             }
         }
 
-    @Override
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
 
     public int getIdTaken() {
         return idTaken;

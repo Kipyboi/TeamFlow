@@ -86,18 +86,9 @@ public class Gebruiker {
         return gebruikersNaam;
     }
 
-    public void setGebruikersNaam(String gebruikersNaam) {
-        this.gebruikersNaam = gebruikersNaam;
-    }
-
     public int getIdGebruiker() {
         return idGebruiker;
     }
-
-    public void setIdGebruiker(int idGebruiker) {
-        this.idGebruiker = idGebruiker;
-    }
-
     public void addTeam(GebruikerHasTeam ght) {
         teams.add(ght);
     }
@@ -108,10 +99,6 @@ public class Gebruiker {
 
     public void addScrumItem(GebruikerHasScrumItem ghsi) {
         scrumItems.add(ghsi);
-    }
-
-    public void removeScrumItem(GebruikerHasScrumItem ghsi) {
-        scrumItems.remove(ghsi);
     }
 
     public ArrayList<GebruikerHasScrumItem> getScrumItems() {

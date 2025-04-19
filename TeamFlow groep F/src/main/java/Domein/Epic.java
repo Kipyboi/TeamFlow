@@ -11,6 +11,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import static Domein.Main.navigationStack;
+
 public class Epic extends ScrumItem  implements IZoek, IMenu {
     private int idEpic;
     ArrayList<UserStory> UserStories;
@@ -19,37 +21,39 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
         super(scrumItemNaam, beschrijving);
         this.idEpic = idEpic;
     }
+    @Override
     public void zoek (Scanner scanner) throws SQLException {
-        System.out.println("Typ hieronder de naam in van de epic die u zoekt");
+        System.out.println("Typ hieronder de naam in van de userstory die u zoekt");
         String zoekterm = scanner.nextLine();
-        Team geselecteerdTeam = GeselecteerdTeamSession.getGeselecteerdTeam();
         boolean gevonden = false;
 
-        for (Taken epic : geselecteerdTeam.getTaken()) {
-            if (epic.getScrumItemNaam().toLowerCase().contains(zoekterm.toLowerCase())) {
-                System.out.println("Epic:" + epic.getScrumItemNaam());
+        for (UserStory userStory : UserStories) {
+            if (userStory.getScrumItemNaam().toLowerCase().contains(zoekterm.toLowerCase())) {
+                System.out.println("Userstory:" + userStory.getScrumItemNaam());
                 System.out.println();
                 gevonden = true;
             }
         }
         if(!gevonden) {
-            System.out.println("Epic is niet gevonden.");
+            System.out.println("Userstory is niet gevonden.");
             return;
         }
-        System.out.println("Typ de naam van de epic die u wilt bekijken.");
+        System.out.println("Typ de naam van de userstory die u wilt bekijken.");
         String epicNaam = scanner.nextLine();
         boolean epicGevonden = false;
 
 
-        for (Taken epic : geselecteerdTeam.getTaken()) {
-            if (epic.getScrumItemNaam().equalsIgnoreCase(epicNaam)) {
-                epic.menu(scanner);
+        for (UserStory userStory : UserStories) {
+            if (userStory.getScrumItemNaam().equalsIgnoreCase(epicNaam)) {
+                navigationStack.push(userStory);
+                Main.Contextmenu(scanner);
                 epicGevonden = true;
                 break;
             }
         }
         if (!epicGevonden) {
             System.out.println("Geen geldige epic met deze naam gevonden");
+            Main.Contextmenu(scanner);
         }
     }
 
@@ -69,44 +73,6 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
         return gebruikers;
     }
 
-
-
-
-//    @Override
-//    public void zoek(Scanner scanner) {
-//        System.out.println("Typ hieronder de naam in van de user story die u zoekt:");
-//        String zoekterm = scanner.nextLine();
-//
-//        Epic geselecteerdeEpic = GeselecteerdeEpicSession.getGeselecteerdeEpic();
-//        if (geselecteerdeEpic == null || geselecteerdeEpic.getUserStories() == null) {
-//            System.out.println("Geen geselecteerde epic of user stories gevonden.");
-//            return;
-//        }
-//
-//        boolean gevonden = false;
-//        for (UserStory us : geselecteerdeEpic.getUserStories()) {
-//            if (us.getScrumItemNaam().toLowerCase().contains(zoekterm.toLowerCase())) {
-//                System.out.println("Gevonden: " + us.getScrumItemNaam());
-//                gevonden = true;
-//            }
-//        }
-//
-//        if (!gevonden) {
-//            System.out.println("Geen user stories gevonden met de zoekterm: " + zoekterm);
-//            return;
-//        }
-//
-//        System.out.println("Typ de naam van de user story die u wilt bekijken:");
-//        String usNaam = scanner.nextLine();
-//        for (UserStory us : geselecteerdeEpic.getUserStories()) {
-//            if (us.getScrumItemNaam().equalsIgnoreCase(usNaam)) {
-//                us.gaNaar(scanner);
-//                return;
-//            }
-//        }
-//
-//        System.out.println("User story met de naam '" + usNaam + "' niet gevonden.");
-//    }
     public void gebruikerToewijzen (Scanner scanner) throws SQLException {
         Gebruiker gebruiker = null;
         System.out.println("Typ de naam in van de gebruiker die je wilt toewijzen: ");
@@ -260,7 +226,7 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
 
 
     }
-
+    @Override
     public void menu(Scanner scanner) throws SQLException {
         while (true) {
             System.out.println("\nEpic Menu: " + scrumItemNaam + ": " + beschrijving);
@@ -324,6 +290,7 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
         }
 
         System.out.println("Typ 'verwijder' om een Userstory te verwijderen type 'aanmaken' om een userstory aan temaken typ 'terug' om terug tegaan of typ de naam van een userstory om naar de userstory tegaan:");
+        System.out.println("of typ zoek om een userstory te zoeken");
         String keuze = scanner.nextLine();
 
         if (keuze.equalsIgnoreCase("terug")) {
@@ -339,10 +306,15 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
             UserstoryAanmaken(scanner);
             navigeerNaarUserStory(scanner);
             return;
-        }else {
+        }
+        else if (keuze.equalsIgnoreCase("zoek")) {
+            zoek(scanner);
+            return;
+        }
+        else {
             for (UserStory userStory : UserStories) {
                 if (userStory.getScrumItemNaam().equalsIgnoreCase(keuze)) {
-                    Main.navigationStack.push(userStory);
+                    navigationStack.push(userStory);
                     Main.Contextmenu(scanner);
                     return;
                 } else {
@@ -376,40 +348,6 @@ public class Epic extends ScrumItem  implements IZoek, IMenu {
         System.out.println("Userstory niet gevonden. Probeer opnieuw.");
         Main.Contextmenu(scanner);
     }
-
-    public void toonUserStories(Scanner scanner) {
-        ArrayList<UserStory> userStories = this.getUserStories();
-
-        if (userStories == null || userStories.isEmpty()) {
-            System.out.println("Deze Epic heeft nog geen User Stories.");
-            return;
-        }
-
-        System.out.println("User Stories voor deze Epic:");
-        int num = 1;
-        for (UserStory us : userStories) {
-            System.out.println("   " + num + ". " + us.getScrumItemNaam());
-            num++;
-        }
-        System.out.print("Typ het nummer van de User Story die je verder wilt bekijken: ");
-        int keuze = -1;
-        try {
-            keuze = Integer.parseInt(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            System.out.println("Ongeldige invoer.");
-            return;
-        }
-
-        if (keuze < 1 || keuze > userStories.size()) {
-            System.out.println("Ongeldige keuze.");
-            return;
-        }
-
-        UserStory gekozenUser = userStories.get(keuze - 1);
-        gekozenUser.toonTaken(scanner);
-
-    }
-
 
     public int getIdEpic() {
         return idEpic;

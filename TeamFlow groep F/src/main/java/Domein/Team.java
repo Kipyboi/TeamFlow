@@ -6,36 +6,26 @@ import Utils.Session;
 import java.sql.*;
 import java.util.List;
 
-import javax.xml.crypto.Data;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import static Domein.Main.navigationStack;
 
 public class Team implements IZoek, IMenu {
     private int idTeam;
     private String teamNaam;
     private ArrayList<GebruikerHasTeam> gebruikers;
     private ArrayList<Epic> epics;
-    private ArrayList<Taken> taak;
-    private ArrayList<UserStory> userStory;
+
 
     public Team (int idTeam, String TeamNaam) {
         this.idTeam = idTeam;
         this.teamNaam = TeamNaam;
         gebruikers = new ArrayList<>();
         epics = new ArrayList<>();
-        taak = new ArrayList<>();
-        userStory = new ArrayList<>();
-    }
-    public List<UserStory> getUserStory() {
     }
 
-    public List<Taken> getTaken() {
-    }
-
-    public String getTeamNaam() {
-        return teamNaam;
-    }
 
     public void gebruikerToevoegen(Scanner scanner) throws SQLException {
 
@@ -90,27 +80,42 @@ public class Team implements IZoek, IMenu {
 
         }
     }
+    @Override
+    public void zoek (Scanner scanner) throws SQLException {
+        System.out.println("Typ hieronder de naam in van de epic die u zoekt");
+        String zoekterm = scanner.nextLine();
+        boolean gevonden = false;
 
-//    public void zoek (Scanner scanner) throws SQLException {
-//        System.out.println("Typ hieronder de naam in van de epic die u zoekt");
-//        String zoekterm = scanner.nextLine();
-//        Team geselecteerdTeam = GeselecteerdTeamSession.getGeselecteerdTeam();
-//        for (Epic epic : geselecteerdTeam.getEpics()) {
-//            if (epic.getScrumItemNaam().toLowerCase().contains(zoekterm.toLowerCase())) {
-//                System.out.println(epic.getScrumItemNaam());
-//                System.out.println();
-//            }
-//        }
-//        System.out.println("Typ de naam van de epic die u wilt bekijken.");
-//        String epicNaam = scanner.nextLine();
-//        for (Epic epic : geselecteerdTeam.getEpics()) {
-//            if (epic.getScrumItemNaam().equalsIgnoreCase(epicNaam)) {
-//                epic.menu(scanner);
-//            }
-//        }
-//
-//
-//    }
+        for (Epic epic : epics) {
+            if (epic.getScrumItemNaam().toLowerCase().contains(zoekterm.toLowerCase())) {
+                System.out.println("Epic:" + epic.getScrumItemNaam());
+                System.out.println();
+                gevonden = true;
+            }
+        }
+        if(!gevonden) {
+            System.out.println("Epic is niet gevonden.");
+            return;
+        }
+        System.out.println("Typ de naam van de epic die u wilt bekijken.");
+        String epicNaam = scanner.nextLine();
+        boolean epicGevonden = false;
+
+
+        for (Epic epic : epics) {
+            if (epic.getScrumItemNaam().equalsIgnoreCase(epicNaam)) {
+                navigationStack.push(epic);
+                Main.Contextmenu(scanner);
+                epicGevonden = true;
+                break;
+            }
+        }
+        if (!epicGevonden) {
+            System.out.println("Geen geldige epic met deze naam gevonden");
+            Main.Contextmenu(scanner);
+        }
+    }
+    @Override
     public void BerichtAanmaken (Scanner scanner) throws SQLException {
         System.out.println("Typ hieronder het bericht dat je wilt posten (enter om te versturen): ");
         String berichtTekst = scanner.nextLine();
@@ -180,54 +185,11 @@ public class Team implements IZoek, IMenu {
         Main.Contextmenu(scanner);
     }
 
-    public void gaNaar (Scanner scanner) {
-
-    }
-
-    public ArrayList<GebruikerHasTeam> getGebruikers() {
-        return gebruikers;
-    }
-
-    public void setGebruikers(ArrayList<GebruikerHasTeam> gebruikers) {
-        this.gebruikers = gebruikers;
-    }
-
     public ArrayList<Epic> getEpics() {
         return epics;
     }
 
-    public void toonEpics(Scanner scanner) {
-        System.out.println("Details van de Epics voor het team: " + this.getTeamNaam());
-        ArrayList<Epic> epics = this.getEpics();
 
-        if (epics == null || epics.isEmpty()) {
-            System.out.println("Dit team heeft geen epics.");
-            return;
-        } else {
-            int sum = 1;
-            for (Epic epic : epics) {
-                System.out.println("status: " + epic.getStatus());
-                System.out.println("Epic " + sum + ". " + epic.getScrumItemNaam());
-                sum++;
-            }
-            System.out.print("Typ het nummer van de Epic die je verder wilt bekijken: ");
-            int keuze = -1;
-            System.out.println("Wil je ook nog de status veranderen van deze Epic");
-            try {
-                keuze = Integer.parseInt(scanner.nextLine());
-            } catch (NumberFormatException e) {
-                System.out.println("Ongeldige invoer.");
-                return;
-            }
-
-            if (keuze < 1 || keuze > epics.size()) {
-                System.out.println("Ongeldige keuze, je moet wel een nummer kiezen die bij de Epic staat.");
-                return;
-            }
-            Epic gekozenEpic = epics.get(keuze - 1);
-            gekozenEpic.toonUserStories(scanner);
-        }
-    }
 
     public void toonBerichten(Scanner scanner) throws SQLException {
         List<Bericht> berichten = new ArrayList<>(); // Declare and initialize the list
@@ -264,7 +226,7 @@ public class Team implements IZoek, IMenu {
     public String getName () {
         return teamNaam;
     }
-
+    @Override
     public void menu(Scanner scanner) throws SQLException {
         while (true) {
             System.out.println("\nTeam Menu: " + teamNaam);
@@ -332,6 +294,7 @@ public class Team implements IZoek, IMenu {
         }
     
         System.out.println("Typ de naam van de Epic die u wilt bekijken typ 'terug' om terug te gaan 'aanmaken' om een epic aan te maken 'verwijder' om een epic te verwijderen of typ de naam van een epic om naar de epic tegaan:");
+        System.out.println("of typ zoek om te zoeken naar een epic");
         String keuze = scanner.nextLine();
     
         if (keuze.equalsIgnoreCase("terug")) {
@@ -345,7 +308,12 @@ public class Team implements IZoek, IMenu {
             // verwijder een epic
             EpicVerwijderen(scanner);
             return;
-        } else {
+        }
+        else if (keuze.equalsIgnoreCase("zoek")) {
+            zoek(scanner);
+            return;
+        }
+        else {
             // ga naar de epic
             for (Epic epic : epics) {
                 if (epic.getScrumItemNaam().equalsIgnoreCase(keuze)) {

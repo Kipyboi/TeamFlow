@@ -14,9 +14,4 @@ public class Permissie {
         this.gebruikerHasTeam_gebruiker_idGebruiker = gebruikerHasTeam_gebruiker_idGebruiker;
         this.gebruikerHasTeam_team_idTeam = gebruikerHasTeam_team_idTeam;
     }
-
-
-    public void berichtAanmaken(){
-        //maak aan
-    }
 }
