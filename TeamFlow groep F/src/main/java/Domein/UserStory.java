@@ -16,14 +16,12 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
     private int Epic_idEpic;
     private ArrayList<Taken> taken;
 
-    public UserStory(int idUserStory, int Epic_IdEpic, String scrumItemNaam, String beschrijving) {
+    public UserStory(int idUserStory, int Epic_IdEpic, String scrumItemNaam, String beschrijving) throws SQLException {
         super(scrumItemNaam, beschrijving);
         this.idUserStory = idUserStory;
         this.Epic_idEpic = Epic_IdEpic;
     }
-    public UserStory(String scrumItemNaam, String beschrijving) {
-        super(scrumItemNaam, beschrijving);
-    }
+
 
 //    @Override
 //    public void zoek(Scanner scanner) {
@@ -45,7 +43,41 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
 //        }
 //
 //    }
-    public void gebruikerToewijzen (Gebruiker gebruiker) throws SQLException {
+
+
+    @Override
+    protected ArrayList<GebruikerHasScrumItem> checkToegewezen() throws SQLException {
+        gebruikers = new ArrayList<>();
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "SELECT * FROM gebruiker_has_Userstory WHERE gebruiker_idGebruiker = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setInt(1, Session.getActiveGebruiker().getIdGebruiker());
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                GebruikerHasScrumItem ghsi = new GebruikerHasScrumItem(Session.getActiveGebruiker(), this);
+                gebruikers.add(ghsi);
+            }
+        }
+        return gebruikers;
+    }
+
+    public void gebruikerToewijzen (Scanner scanner) throws SQLException {
+        Gebruiker gebruiker = null;
+        System.out.println("Typ de naam in van de gebruiker die je wilt toewijzen: ");
+        String naam = scanner.nextLine();
+        try (Connection connection = DatabaseUtil.getConnection()) {
+            String query = "SELECT * FROM gebruiker WHERE GebruikersNaam = ?";
+            PreparedStatement statement = connection.prepareStatement(query);
+            statement.setString(1, naam);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                gebruiker = new Gebruiker(resultSet.getInt("idGebruiker"), resultSet.getString("GebruikersNaam"));
+            }
+            else {
+                System.out.println("Gebruiker niet gevonden.");
+                Main.Contextmenu(scanner);
+            }
+        }
         GebruikerHasScrumItem ghsi = new GebruikerHasScrumItem(gebruiker, this);
         gebruiker.addScrumItem(ghsi);
         gebruikers.add(ghsi);
@@ -119,7 +151,7 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
             e.printStackTrace();
         }
         for (Bericht bericht : berichten) {
-            bericht.toString();
+            System.out.println(bericht.toString());
         }
         System.out.println("-- Typ posten om een nieuw bericht aan te maken of typ terug om terug te gaan --");
         String keuze = scanner.nextLine();
@@ -135,9 +167,10 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
 
     public void menu(Scanner scanner) throws SQLException {
         while (true) {
-            System.out.println("\nUser Story Menu: " + scrumItemNaam);
+            System.out.println("\nUser Story Menu: " + scrumItemNaam + ": " + beschrijving);
             System.out.println("1. Navigeer naar een Taak");
             System.out.println("2. Toon berichten");
+            System.out.println("3. Gebruiker toewijzen aan userstory");
             System.out.println("3. Terug");
             System.out.print("Kies een optie: ");
             int keuze;
@@ -157,7 +190,10 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
                     toonBerichten(scanner);
                     break;
                 case 3:
+                    gebruikerToewijzen(scanner);
+                case 4:
                     Main.gaTerug();
+                    Main.Contextmenu(scanner);
                     return;
                 default:
                     System.out.println("Ongeldige keuze. Probeer opnieuw.");
@@ -245,8 +281,11 @@ public class UserStory extends ScrumItem  implements IZoek, IMenu {
     public void BerichtAanmaken (Scanner scanner) throws SQLException {
         boolean toegewezen = false;
         for (GebruikerHasScrumItem ghsi : Session.getActiveGebruiker().getScrumItems()) {
-            if (ghsi.getScrumItem().getGebruikers().contains(Session.getActiveGebruiker())) {
-                toegewezen = true;
+            ArrayList<GebruikerHasScrumItem> temp = ghsi.getScrumItem().gebruikers;
+            for (GebruikerHasScrumItem ghsi2 : temp) {
+                if(ghsi2.getGebruiker() == Session.getActiveGebruiker()){
+                    toegewezen = true;
+                }
             }
         }
 

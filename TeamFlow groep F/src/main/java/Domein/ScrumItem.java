@@ -14,18 +14,17 @@ public abstract class ScrumItem{
     protected String beschrijving;
     protected ArrayList<GebruikerHasScrumItem> gebruikers;
 
-    public ScrumItem(String scrumItemNaam, int idScrumItem, String beschrijving) {
-        this.scrumItemNaam = scrumItemNaam;
-        this.idScrumItem = idScrumItem;
-        this.status = 0;
-        this.beschrijving = beschrijving;
-        gebruikers = new ArrayList<>();
-    }
-    public ScrumItem (String scrumItemNaam, String beschrijving) {
+
+
+    protected abstract ArrayList<GebruikerHasScrumItem> checkToegewezen() throws SQLException;
+
+
+    public ScrumItem (String scrumItemNaam, String beschrijving) throws SQLException {
         this.scrumItemNaam = scrumItemNaam;
         gebruikers = new ArrayList<>();
         this.status = 0;
         this.beschrijving = beschrijving;
+        this.gebruikers = checkToegewezen();
     }
     public String getScrumItemNaam () {
         return scrumItemNaam;
@@ -36,7 +35,7 @@ public abstract class ScrumItem{
     public int getIdScrumItem () {
         return idScrumItem;
     }
-    public abstract void gebruikerToewijzen (Gebruiker gebruiker) throws SQLException;
+    public abstract void gebruikerToewijzen (Scanner scanner) throws SQLException;
     public void gaNaar (Scanner scanner) {
 
     }
