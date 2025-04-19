@@ -12,6 +12,7 @@ import java.util.Scanner;
 public class Taken extends ScrumItem implements IMenu{
     private int UserStory_idUserStory;
     private int idTaken;
+    private int status;
 
     public Taken (int UserStory_idUserStory, int IdTaken, String scrumItemNaam, String beschrijving) throws SQLException {
         super(scrumItemNaam, beschrijving);
@@ -35,6 +36,16 @@ public class Taken extends ScrumItem implements IMenu{
         }
         return gebruikers;
     }
+
+
+    }
+        this.status = status;
+    public void setStatus(int status) {
+
+    }
+        return status;
+    public int getStatus() {
+    @Override
 
     public void gebruikerToewijzen (Scanner scanner) throws SQLException {
         Gebruiker gebruiker = null;

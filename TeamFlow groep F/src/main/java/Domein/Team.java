@@ -23,6 +23,11 @@ public class Team implements IZoek, IMenu {
         gebruikers = new ArrayList<>();
         epics = new ArrayList<>();
     }
+
+    public String getTeamNaam() {
+        return teamNaam;
+    }
+
     public void gebruikerToevoegen(Scanner scanner) throws SQLException {
 
         System.out.println("Typ de naam in van de gebruiker die je wilt toevoegen.");
@@ -76,8 +81,6 @@ public class Team implements IZoek, IMenu {
 
         }
     }
-
-
 
 //    public void zoek (Scanner scanner) throws SQLException {
 //        System.out.println("Typ hieronder de naam in van de epic die u zoekt");
@@ -182,6 +185,39 @@ public class Team implements IZoek, IMenu {
 
     public ArrayList<Epic> getEpics() {
         return epics;
+    }
+
+    public void toonEpics(Scanner scanner) {
+        System.out.println("Details van de Epics voor het team: " + this.getTeamNaam());
+        ArrayList<Epic> epics = this.getEpics();
+
+        if (epics == null || epics.isEmpty()) {
+            System.out.println("Dit team heeft geen epics.");
+            return;
+        } else {
+            int sum = 1;
+            for (Epic epic : epics) {
+                System.out.println("status: " + epic.getStatus());
+                System.out.println("Epic " + sum + ". " + epic.getScrumItemNaam());
+                sum++;
+            }
+            System.out.print("Typ het nummer van de Epic die je verder wilt bekijken: ");
+            int keuze = -1;
+            System.out.println("Wil je ook nog de status veranderen van deze Epic");
+            try {
+                keuze = Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Ongeldige invoer.");
+                return;
+            }
+
+            if (keuze < 1 || keuze > epics.size()) {
+                System.out.println("Ongeldige keuze, je moet wel een nummer kiezen die bij de Epic staat.");
+                return;
+            }
+            Epic gekozenEpic = epics.get(keuze - 1);
+            gekozenEpic.toonUserStories(scanner);
+        }
     }
 
     public void toonBerichten(Scanner scanner) throws SQLException {
