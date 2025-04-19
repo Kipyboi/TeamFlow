@@ -368,7 +368,7 @@ public class Team implements IZoek, IMenu {
                 try (Connection connection = DatabaseUtil.getConnection()) {
                     String query = "DELETE FROM Epic WHERE idEpic = ?";
                     PreparedStatement statement = connection.prepareStatement(query);
-                    statement.setInt(1, epic.getIdScrumItem());
+                    statement.setInt(1, epic.getIdEpic());
                     statement.executeUpdate();
                 }
 

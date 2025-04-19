@@ -108,7 +108,7 @@ public class Taken extends ScrumItem implements IMenu {
                 System.out.println("\nTaak Menu: " + scrumItemNaam + ": " + beschrijving);
                 System.out.println("1. Toon berichten");
                 System.out.println("2. Gebruiker toewijzen aan taak");
-                System.out.println("2. Terug");
+                System.out.println("3. Terug");
                 System.out.print("Kies een optie: ");
                 int keuze;
 
@@ -213,5 +213,9 @@ public class Taken extends ScrumItem implements IMenu {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public int getIdTaken() {
+        return idTaken;
     }
 }
