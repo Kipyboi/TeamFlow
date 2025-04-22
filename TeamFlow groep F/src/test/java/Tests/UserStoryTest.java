@@ -14,6 +14,7 @@ public class UserStoryTest {
             // Arrange: Create a UserStory instance
             UserStory userStory = new UserStory(1, 10, "Login Feature", "Implement secure authentication");
 
+
             // Act & Assert: Verify object is created successfully
             assertNotNull(userStory, "UserStory object should not be null");
 

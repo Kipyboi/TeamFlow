@@ -15,6 +15,7 @@ public class TakenTest {
             // Arrange: Create a Taken instance
             Taken taken = new Taken(1, 101, "Implement Feature", "Develop login system");
 
+
             // Act & Assert: Access private fields using reflection
             Field userStoryField = Taken.class.getDeclaredField("UserStory_idUserStory");
             userStoryField.setAccessible(true);
